@@ -1,0 +1,40 @@
+/* You can add global styles to this file, and also import other style files */
+
+// Import SCSS variables
+@import 'styles/variables';
+
+html, body { 
+  height: 100%; 
+  margin: 0;
+  padding: 0;
+}
+
+body { 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  background-color: $gray-50;
+}
+
+// Utility classes for spacing
+.m-xs { margin: $spacing-xs; }
+.m-sm { margin: $spacing-sm; }
+.m-md { margin: $spacing-md; }
+.m-lg { margin: $spacing-lg; }
+.m-xl { margin: $spacing-xl; }
+
+.p-xs { padding: $spacing-xs; }
+.p-sm { padding: $spacing-sm; }
+.p-md { padding: $spacing-md; }
+.p-lg { padding: $spacing-lg; }
+.p-xl { padding: $spacing-xl; }
+
+// Utility classes for text colors
+.text-primary { color: $primary; }
+.text-accent { color: $accent; }
+.text-warn { color: $warn; }
+.text-success { color: $success; }
+.text-muted { color: $gray-600; }
+
+// Common border radius classes
+.rounded-sm { border-radius: $border-radius-sm; }
+.rounded-md { border-radius: $border-radius-md; }
+.rounded-lg { border-radius: $border-radius-lg; }
