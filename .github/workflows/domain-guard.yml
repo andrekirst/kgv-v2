@@ -1,0 +1,255 @@
+name: 🛡️ Domain Guard - Compliance Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  domain-compliance:
+    name: 🔍 Domain Model Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+          
+      - name: 🛡️ Validate Domain Protection
+        run: |
+          echo "🔍 Checking domain protection setup..."
+          
+          # Check if CLAUDE.md exists
+          if [ ! -f "CLAUDE.md" ]; then
+            echo "❌ CLAUDE.md domain contract missing!"
+            exit 1
+          fi
+          
+          # Check domain guard setup
+          if [ ! -d ".domain-guard" ]; then
+            echo "❌ Domain guard directory missing!"
+            exit 1
+          fi
+          
+          # Verify required files
+          REQUIRED_FILES=(
+            ".domain-guard/pre-commit-hook.sh"
+            ".domain-guard/domain-validation.json" 
+            "docs/domain-model-documentation.md"
+          )
+          
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Required file missing: $file"
+              exit 1
+            fi
+          done
+          
+          echo "✅ Domain protection setup verified"
+          
+      - name: 🔒 Check Domain Model Integrity
+        run: |
+          echo "🔍 Analyzing domain model integrity..."
+          
+          # Check for domain modifications in this PR/push
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Checking PR for domain changes..."
+            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}..HEAD)
+          else
+            echo "Checking recent commits for domain changes..."
+            CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD)
+          fi
+          
+          # Look for domain file changes
+          DOMAIN_CHANGES=$(echo "$CHANGED_FILES" | grep -E "(Domain/|ValueObject|Entity|Aggregate)" || true)
+          
+          if [ -n "$DOMAIN_CHANGES" ]; then
+            echo "⚠️ Domain files modified:"
+            echo "$DOMAIN_CHANGES"
+            
+            # Check if changes are approved (look for special commit message)
+            if ! git log --oneline -1 | grep -q "\[domain-approved\]"; then
+              echo ""
+              echo "❌ Domain changes detected without approval!"
+              echo "🛡️ Domain modifications require explicit approval."
+              echo "📋 Add '[domain-approved]' to commit message if approved."
+              echo "📚 See CLAUDE.md for domain change protocol."
+              exit 1
+            else
+              echo "✅ Domain changes have explicit approval marker"
+            fi
+          else
+            echo "✅ No domain modifications detected"
+          fi
+          
+      - name: 🧪 Run Domain Validation
+        run: |
+          echo "🧪 Running domain validation checks..."
+          
+          # Make scripts executable
+          chmod +x .domain-guard/pre-commit-hook.sh
+          
+          # Run domain validation
+          if .domain-guard/pre-commit-hook.sh; then
+            echo "✅ Domain validation passed"
+          else
+            echo "❌ Domain validation failed"
+            exit 1
+          fi
+          
+      - name: 📊 Generate Compliance Report
+        run: |
+          echo "📊 Generating compliance report..."
+          
+          # Make monitor executable
+          chmod +x .domain-guard/monitor.sh
+          
+          # Run compliance monitoring
+          .domain-guard/monitor.sh
+          
+          # Find the latest report
+          LATEST_REPORT=$(ls -t .domain-guard/reports/compliance-report-*.md 2>/dev/null | head -1)
+          
+          if [ -n "$LATEST_REPORT" ]; then
+            echo "📄 Compliance report generated: $LATEST_REPORT"
+            
+            # Extract compliance score
+            SCORE=$(grep "Compliance Score" "$LATEST_REPORT" | grep -o '[0-9]*%' || echo "Unknown")
+            echo "📊 Compliance Score: $SCORE"
+            
+            # Add to GitHub summary
+            echo "## 🛡️ Domain Compliance Report" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Score**: $SCORE" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Add key findings
+            echo "### Key Findings" >> $GITHUB_STEP_SUMMARY
+            grep -A 10 "Executive Summary" "$LATEST_REPORT" | tail -n +3 >> $GITHUB_STEP_SUMMARY || true
+            
+          else
+            echo "⚠️ No compliance report generated"
+          fi
+          
+      - name: 💬 Comment PR (if applicable)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Find latest compliance report
+            const reportsDir = '.domain-guard/reports';
+            if (!fs.existsSync(reportsDir)) {
+              console.log('No reports directory found');
+              return;
+            }
+            
+            const reports = fs.readdirSync(reportsDir)
+              .filter(file => file.startsWith('compliance-report-'))
+              .sort()
+              .reverse();
+              
+            if (reports.length === 0) {
+              console.log('No compliance reports found');
+              return;
+            }
+            
+            const latestReport = path.join(reportsDir, reports[0]);
+            const reportContent = fs.readFileSync(latestReport, 'utf8');
+            
+            // Extract key information
+            const scoreMatch = reportContent.match(/Compliance Score.*?(\d+%)/);
+            const score = scoreMatch ? scoreMatch[1] : 'Unknown';
+            
+            const summaryStart = reportContent.indexOf('## Executive Summary');
+            const summaryEnd = reportContent.indexOf('---', summaryStart);
+            const summary = summaryStart !== -1 && summaryEnd !== -1 
+              ? reportContent.substring(summaryStart, summaryEnd).trim()
+              : 'Summary not available';
+            
+            const comment = `## 🛡️ Domain Guard Report
+            
+            **Compliance Score**: ${score}
+            
+            ${summary}
+            
+            <details>
+            <summary>📊 View Full Report</summary>
+            
+            \`\`\`markdown
+            ${reportContent}
+            \`\`\`
+            
+            </details>
+            
+            ---
+            *🤖 Generated by Domain Guard CI*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+            
+      - name: 📈 Upload Compliance Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: domain-compliance-report-${{ github.run_number }}
+          path: .domain-guard/reports/
+          retention-days: 30
+          
+      - name: 🚨 Fail on Low Compliance
+        run: |
+          # Check compliance score and fail if too low
+          LATEST_REPORT=$(ls -t .domain-guard/reports/compliance-report-*.md 2>/dev/null | head -1)
+          
+          if [ -n "$LATEST_REPORT" ]; then
+            SCORE=$(grep "Compliance Score" "$LATEST_REPORT" | grep -o '[0-9]*' || echo "0")
+            echo "Compliance score: $SCORE%"
+            
+            if [ "$SCORE" -lt 80 ]; then
+              echo ""
+              echo "❌ Domain compliance too low: $SCORE%"
+              echo "🎯 Required minimum: 80%"
+              echo "🛠️ Please address the issues in the compliance report"
+              echo "📚 See CLAUDE.md and docs/development-workflow.md for guidance"
+              exit 1
+            else
+              echo "✅ Domain compliance acceptable: $SCORE%"
+            fi
+          else
+            echo "⚠️ Could not determine compliance score"
+          fi
+
+  security-scan:
+    name: 🔐 Security Scan
+    runs-on: ubuntu-latest
+    needs: domain-compliance
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: 🔒 Run Trivy Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          
+      - name: 📤 Upload Security Results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'

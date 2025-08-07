@@ -1,0 +1,166 @@
+{
+  "$schema": "./domain-schema.json",
+  "version": "1.0.0",
+  "protection": {
+    "level": "strict",
+    "enforcementMode": "blocking"
+  },
+  "protectedTypes": {
+    "valueObjects": {
+      "Aktenzeichen": {
+        "properties": {
+          "Value": { "type": "string", "immutable": true },
+          "Prefix": { "type": "string", "immutable": true, "pattern": "^(32\\.2|33\\.2)$" },
+          "Number": { "type": "int", "immutable": true, "min": 1 },
+          "Year": { "type": "int", "immutable": true, "min": 2000 },
+          "ListType": { "type": "WaitingListType", "immutable": true }
+        },
+        "methods": {
+          "Create": { "static": true, "returnType": "Result<Aktenzeichen>" },
+          "Parse": { "static": true, "returnType": "Result<Aktenzeichen>" }
+        },
+        "businessRules": {
+          "pattern": "^(32\\.2|33\\.2)\\s+(\\d+)\\s+(\\d{4})$",
+          "validation": "Must follow exact format: [Prefix] [Number] [Year]"
+        }
+      },
+      "PersonData": {
+        "properties": {
+          "FirstName": { "type": "string", "immutable": true, "required": true },
+          "LastName": { "type": "string", "immutable": true, "required": true },
+          "DateOfBirth": { "type": "DateTime", "immutable": true, "required": true },
+          "Email": { "type": "string", "immutable": true, "optional": true },
+          "Phone": { "type": "string", "immutable": true, "optional": true }
+        },
+        "computed": {
+          "FullName": { "expression": "FirstName + \" \" + LastName" }
+        },
+        "businessRules": {
+          "minAge": 18,
+          "validation": "Person must be at least 18 years old"
+        }
+      },
+      "Address": {
+        "properties": {
+          "Street": { "type": "string", "immutable": true, "required": true },
+          "HouseNumber": { "type": "string", "immutable": true, "required": true },
+          "PostalCode": { "type": "string", "immutable": true, "required": true, "pattern": "^\\d{5}$" },
+          "City": { "type": "string", "immutable": true, "required": true },
+          "Country": { "type": "string", "immutable": true, "default": "Deutschland" }
+        }
+      }
+    },
+    "aggregateRoots": {
+      "Application": {
+        "identityType": "ApplicationId",
+        "properties": {
+          "Id": { "type": "ApplicationId", "immutable": true },
+          "Aktenzeichen": { "type": "Aktenzeichen", "immutable": true },
+          "PrimaryApplicant": { "type": "PersonData", "immutable": true },
+          "SecondaryApplicant": { "type": "PersonData?", "immutable": true },
+          "SharedAddress": { "type": "Address", "immutable": true },
+          "Status": { "type": "ApplicationStatus", "mutable": true },
+          "ApplicationDate": { "type": "DateTime", "immutable": true },
+          "ExpiryDate": { "type": "DateTime", "mutable": true }
+        },
+        "businessRules": {
+          "validityPeriod": {
+            "initial": 12,
+            "extension": 12,
+            "maxExtensions": 3,
+            "totalMaxMonths": 48
+          },
+          "statusTransitions": {
+            "Pending": ["Active", "Rejected"],
+            "Active": ["Offered", "Rejected"],
+            "Offered": ["Assigned", "Active", "Rejected"],
+            "Assigned": ["Completed"],
+            "Rejected": [],
+            "Completed": []
+          }
+        }
+      },
+      "WaitingList": {
+        "identityType": "WaitingListId",
+        "properties": {
+          "Id": { "type": "WaitingListId", "immutable": true },
+          "Type": { "type": "WaitingListType", "immutable": true },
+          "Name": { "type": "string", "immutable": true }
+        },
+        "businessRules": {
+          "ranking": "FIFO",
+          "tieBreaker": "ApplicationId",
+          "uniqueConstraints": ["ApplicationId per WaitingList"]
+        }
+      }
+    },
+    "entities": {
+      "ApplicationStatusChange": {
+        "properties": {
+          "Timestamp": { "type": "DateTime", "immutable": true },
+          "Status": { "type": "ApplicationStatus", "immutable": true },
+          "Reason": { "type": "string", "immutable": true }
+        }
+      },
+      "ApplicationExtension": {
+        "properties": {
+          "ExtensionDate": { "type": "DateTime", "immutable": true },
+          "NewExpiryDate": { "type": "DateTime", "immutable": true },
+          "Reason": { "type": "string", "immutable": true }
+        }
+      },
+      "WaitingListEntry": {
+        "properties": {
+          "ApplicationId": { "type": "ApplicationId", "immutable": true },
+          "Aktenzeichen": { "type": "Aktenzeichen", "immutable": true },
+          "ApplicationDate": { "type": "DateTime", "immutable": true },
+          "Rank": { "type": "int", "mutable": true }
+        }
+      }
+    },
+    "domainEvents": {
+      "ApplicationCreated": {
+        "version": "1.0.0",
+        "properties": {
+          "EventVersion": { "type": "string", "default": "1.0.0" },
+          "ApplicationId": { "type": "ApplicationId", "required": true },
+          "Aktenzeichen": { "type": "Aktenzeichen", "required": true },
+          "PrimaryApplicant": { "type": "PersonData", "required": true },
+          "SecondaryApplicant": { "type": "PersonData?", "optional": true },
+          "SharedAddress": { "type": "Address", "required": true },
+          "WaitingListType": { "type": "WaitingListType", "required": true },
+          "OccurredOn": { "type": "DateTime", "required": true }
+        }
+      },
+      "ApplicationStatusChanged": {
+        "version": "1.0.0",
+        "properties": {
+          "EventVersion": { "type": "string", "default": "1.0.0" },
+          "ApplicationId": { "type": "ApplicationId", "required": true },
+          "FromStatus": { "type": "ApplicationStatus", "required": true },
+          "ToStatus": { "type": "ApplicationStatus", "required": true },
+          "Reason": { "type": "string", "optional": true },
+          "OccurredOn": { "type": "DateTime", "required": true }
+        }
+      }
+    }
+  },
+  "validationRules": {
+    "immutability": {
+      "enforceValueObjectImmutability": true,
+      "enforceAggregateRootInvariants": true,
+      "preventBusinessRuleModification": true
+    },
+    "businessLogic": {
+      "enforceStatusTransitions": true,
+      "enforceValidityPeriods": true,
+      "enforceFIFORanking": true,
+      "enforceUniqueConstraints": true
+    },
+    "eventSourcing": {
+      "enforceEventVersioning": true,
+      "enforceBackwardCompatibility": true,
+      "preventSchemaBreaking": true
+    }
+  }
+}
