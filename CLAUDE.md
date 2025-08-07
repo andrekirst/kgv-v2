@@ -13,15 +13,18 @@
 These domain objects are **CARVED IN STONE** and must NOT be changed without explicit approval:
 
 #### **Value Objects (IMMUTABLE)**
+
 - `Aktenzeichen` - File number format: "32.2 [Number] [Year]" (e.g., "32.2 128 2024")
 - `PersonData` - Person information with validation (FirstName, LastName, DateOfBirth, Email, Phone)
 - `Address` - German address format (Street, HouseNumber, PostalCode, City, Country)
 
 #### **Aggregate Roots (PROTECTED)**
+
 - `Application` - Main business entity with complete lifecycle management
 - `WaitingList` - Secondary aggregate for FIFO ranking (Nr32 and Nr33)
 
 #### **Entities (CONTROLLED)**
+
 - `ApplicationStatusChange` - Audit trail entries
 - `ApplicationExtension` - Validity extensions (max 3)
 - `WaitingListEntry` - Individual waiting list positions
@@ -33,15 +36,15 @@ These domain objects are **CARVED IN STONE** and must NOT be changed without exp
 public static class ApplicationBusinessRules
 {
     public const int InitialValidityMonths = 12;  // IMMUTABLE
-    public const int ExtensionMonths = 12;        // IMMUTABLE  
+    public const int ExtensionMonths = 12;        // IMMUTABLE
     public const int MaxExtensions = 3;           // IMMUTABLE
-    
+
     // Total maximum validity: 4 years (12 + 3*12 months)
 }
 
 // Status transitions are FIXED business rules
 Pending → {Active, Rejected}
-Active → {Offered, Rejected}  
+Active → {Offered, Rejected}
 Offered → {Assigned, Active, Rejected}
 Assigned → {Completed}
 Rejected/Completed → TERMINAL (no further transitions)
@@ -52,7 +55,7 @@ Rejected/Completed → TERMINAL (no further transitions)
 ```csharp
 // Event schemas are VERSIONED - maintain backward compatibility
 ApplicationCreated v1.0.0       // STABLE SCHEMA
-ApplicationStatusChanged v1.0.0 // STABLE SCHEMA  
+ApplicationStatusChanged v1.0.0 // STABLE SCHEMA
 ApplicationExtended v1.0.0      // STABLE SCHEMA
 AllotmentOffered v1.0.0         // STABLE SCHEMA
 ```
@@ -64,6 +67,7 @@ AllotmentOffered v1.0.0         // STABLE SCHEMA
 You can freely work on these layers:
 
 ### **Infrastructure Layer**
+
 - Entity Framework configurations
 - Repository implementations
 - Database migrations
@@ -71,6 +75,7 @@ You can freely work on these layers:
 - Caching strategies
 
 ### **Application Layer**
+
 - CQRS Commands and Queries
 - Command/Query Handlers
 - Application Services
@@ -78,6 +83,7 @@ You can freely work on these layers:
 - Validation (using domain rules)
 
 ### **Presentation Layer**
+
 - Web API Controllers
 - Request/Response models
 - Authentication/Authorization
@@ -85,6 +91,7 @@ You can freely work on these layers:
 - Error handling
 
 ### **Frontend (Angular)**
+
 - Components and Services
 - State Management (NgRx)
 - HTTP interceptors
@@ -98,6 +105,7 @@ You can freely work on these layers:
 **STOP IMMEDIATELY** if you need to:
 
 ### **Domain Layer Modifications**
+
 - ❌ Add/remove/modify properties in Domain Entities
 - ❌ Change Value Object structures or validation
 - ❌ Alter Business Rule constants or logic
@@ -106,6 +114,7 @@ You can freely work on these layers:
 - ❌ Introduce new Domain Exceptions
 
 ### **Breaking Changes**
+
 - ❌ Rename domain concepts or properties
 - ❌ Change property types or constraints
 - ❌ Modify business validation rules
@@ -119,8 +128,9 @@ You can freely work on these layers:
 ### **Domain Reference Strategy**
 
 **ALWAYS** reference the authoritative domain documentation:
+
 - 📚 **Complete Specification**: `/docs/domain-model-documentation.md`
-- 🏗️ **Architecture Details**: `/docs/architecture-documentation.md`  
+- 🏗️ **Architecture Details**: `/docs/architecture-documentation.md`
 - 📋 **Business Requirements**: `/docs/business-requirements.md`
 
 ### **Code Implementation Rules**
@@ -133,18 +143,19 @@ You can freely work on these layers:
 ### **Domain Object Implementation Templates**
 
 #### **Aktenzeichen (EXACT IMPLEMENTATION)**
+
 ```csharp
 public sealed record Aktenzeichen
 {
-    private static readonly Regex Pattern = 
+    private static readonly Regex Pattern =
         new(@"^(32\.2|33\.2)\s+(\d+)\s+(\d{4})$", RegexOptions.Compiled);
-    
+
     public string Value { get; }
     public string Prefix { get; }          // "32.2" or "33.2"
     public int Number { get; }             // Sequential number
     public int Year { get; }               // Application year
     public WaitingListType ListType { get; } // Nr32 or Nr33
-    
+
     // IMPLEMENTATION: Use exact factory methods from documentation
     public static Result<Aktenzeichen> Create(WaitingListType listType, int number, int year)
     public static Result<Aktenzeichen> Parse(string value)
@@ -152,23 +163,25 @@ public sealed record Aktenzeichen
 ```
 
 #### **PersonData (IMMUTABLE VALUE OBJECT)**
+
 ```csharp
 public sealed record PersonData
 {
     public string FirstName { get; }      // Required, min 1 char
-    public string LastName { get; }       // Required, min 1 char  
+    public string LastName { get; }       // Required, min 1 char
     public DateTime DateOfBirth { get; }  // Required, min 18 years old
     public string Email { get; }          // Optional, RFC format
     public string Phone { get; }          // Optional
-    
+
     // Constructor includes validation - DO NOT MODIFY
     public PersonData(string firstName, string lastName, DateTime dateOfBirth, string email, string phone)
-    
+
     public string FullName => $"{FirstName} {LastName}"; // Computed property
 }
 ```
 
 #### **Application Status Transitions (BUSINESS RULES)**
+
 ```csharp
 // FIXED transition rules - implement exactly as specified
 private static readonly Dictionary<ApplicationStatus, ApplicationStatus[]> ValidTransitions = new()
@@ -187,18 +200,21 @@ private static readonly Dictionary<ApplicationStatus, ApplicationStatus[]> Valid
 ## 🔄 DEVELOPMENT WORKFLOW
 
 ### **Phase 1: Planning (MANDATORY)**
+
 1. 📖 **Review domain documentation** thoroughly
 2. 🎯 **Identify domain concepts** involved in the task
 3. 🛠️ **Plan implementation** without domain modifications
 4. ⚠️ **If domain changes needed** → STOP and request approval
 
 ### **Phase 2: Implementation**
+
 1. 🏗️ **Infrastructure first**: Entity Framework, repositories, migrations
 2. 🎮 **Application layer**: Commands, queries, handlers (using domain rules)
 3. 🌐 **Presentation layer**: Controllers, DTOs, API endpoints
 4. 📋 **Domain layer**: COPY-PASTE from documentation (no modifications)
 
 ### **Phase 3: Validation**
+
 1. ✅ **Domain compliance**: All objects match documentation exactly
 2. ✅ **Business rules**: Implementation follows specifications
 3. ✅ **Event schemas**: Comply with versioned formats
@@ -211,11 +227,13 @@ private static readonly Dictionary<ApplicationStatus, ApplicationStatus[]> Valid
 If you need to modify the domain model:
 
 ### **Step 1: HALT Implementation**
+
 - ⏸️ Stop current implementation immediately
 - 📝 Document the specific change needed
 - 📋 Explain business justification
 
 ### **Step 2: Request Approval**
+
 ```markdown
 🚨 DOMAIN CHANGE REQUEST
 
@@ -227,11 +245,13 @@ If you need to modify the domain model:
 ```
 
 ### **Step 3: Wait for Approval**
+
 - ⏳ Do not proceed with domain changes
 - 🔄 Continue with non-domain work if possible
 - ✅ Only implement after explicit approval
 
 ### **Step 4: Update Documentation First**
+
 - 📝 Update `/docs/domain-model-documentation.md` first
 - 🔄 Update relevant ADRs (Architecture Decision Records)
 - 📋 Update business requirements if needed
@@ -244,15 +264,19 @@ If you need to modify the domain model:
 **Before ANY domain-related implementation, ask yourself:**
 
 1. ❓ **Am I modifying anything in the Domain layer?**
+
    - If YES → Review this document and get approval
 
 2. ❓ **Are my property names exactly matching documentation?**
+
    - If NO → Use exact names from domain specifications
 
 3. ❓ **Are my validation rules identical to specifications?**
+
    - If NO → Implement exactly as documented
 
 4. ❓ **Do my events match the exact schema versions?**
+
    - If NO → Use versioned schemas from documentation
 
 5. ❓ **Have I introduced any new business rules?**
@@ -265,8 +289,9 @@ If you need to modify the domain model:
 ## 🎯 DOMAIN COMPLIANCE CHECKLIST
 
 ### **Implementation Checklist**
+
 - [ ] Referenced domain documentation before starting
-- [ ] Used exact property names from specifications  
+- [ ] Used exact property names from specifications
 - [ ] Implemented business rules as documented (no modifications)
 - [ ] Followed event schemas exactly (correct versions)
 - [ ] No domain layer modifications introduced
@@ -275,6 +300,7 @@ If you need to modify the domain model:
 - [ ] Value Objects implemented as immutable records
 
 ### **Quality Assurance**
+
 - [ ] Domain objects serialize/deserialize correctly
 - [ ] Business rules prevent invalid operations
 - [ ] Event sourcing compatibility maintained
@@ -287,15 +313,18 @@ If you need to modify the domain model:
 ## 📚 QUICK REFERENCE LINKS
 
 ### **Essential Documentation**
+
 - 🎯 **Domain Model Core**: [`/docs/domain-model-documentation.md#core-domain-types`](docs/domain-model-documentation.md#core-domain-types)
-- 📋 **Business Rules**: [`/docs/domain-model-documentation.md#business-rules-katalog`](docs/domain-model-documentation.md#business-rules-katalog)  
+- 📋 **Business Rules**: [`/docs/domain-model-documentation.md#business-rules-katalog`](docs/domain-model-documentation.md#business-rules-katalog)
 - 🔄 **Event Schemas**: [`/docs/domain-model-documentation.md#event-schema-evolution`](docs/domain-model-documentation.md#event-schema-evolution)
 - 🛡️ **Validation Rules**: [`/docs/domain-model-documentation.md#invariants-und-constraints`](docs/domain-model-documentation.md#invariants-und-constraints)
 - 🏗️ **Architecture**: [`/docs/architecture-documentation.md`](docs/architecture-documentation.md)
+- 🌿 **Git Workflow**: [`/docs/git-workflow-guide.md`](docs/git-workflow-guide.md)
 
 ### **Implementation References**
+
 - 🔧 **Entity Framework Setup**: Reference architecture documentation
-- 🎮 **CQRS Implementation**: Use application layer patterns  
+- 🎮 **CQRS Implementation**: Use application layer patterns
 - 🌐 **API Design**: Follow RESTful conventions with domain DTOs
 - 🧪 **Testing Strategy**: Domain specifications as test cases
 
@@ -304,33 +333,36 @@ If you need to modify the domain model:
 ## 🔥 COMMON MISTAKES TO AVOID
 
 ### **❌ Domain Violations**
+
 ```csharp
 // DON'T: Add helpful properties to domain objects
-public class PersonData 
+public class PersonData
 {
     public string DisplayName { get; set; } // ❌ Domain modification
 }
 
 // DO: Use DTOs in application layer
-public class PersonDisplayDto 
+public class PersonDisplayDto
 {
     public string DisplayName { get; set; } // ✅ Application layer
 }
 ```
 
 ### **❌ Business Rule Changes**
+
 ```csharp
 // DON'T: Make rules more flexible
 public const int MaxExtensions = 5; // ❌ Changes business requirement
 
-// DO: Use exact constants from documentation  
+// DO: Use exact constants from documentation
 public const int MaxExtensions = 3; // ✅ As specified in domain model
 ```
 
 ### **❌ Event Schema Modifications**
+
 ```csharp
 // DON'T: Improve event structure
-public record ApplicationCreated 
+public record ApplicationCreated
 {
     public PersonData Applicant { get; set; }        // ❌ Breaking change
     public PersonData SecondaryApplicant { get; set; } // ❌ Schema violation
@@ -350,13 +382,15 @@ public record ApplicationCreated : IDomainEvent
 ## 💡 PRODUCTIVITY TIPS
 
 ### **Efficient Development**
+
 1. **Keep domain documentation open** while coding
-2. **Copy code templates** instead of writing from scratch  
+2. **Copy code templates** instead of writing from scratch
 3. **Use quick reference links** for fast lookups
 4. **Focus on application/infrastructure** layers for creativity
 5. **Ask specific questions** when domain logic is unclear
 
 ### **Avoiding Rework**
+
 1. **Plan non-domain solutions** for new requirements
 2. **Use DTOs liberally** in application and presentation layers
 3. **Implement business logic** in application services (using domain rules)
@@ -368,6 +402,7 @@ public record ApplicationCreated : IDomainEvent
 ## 🎉 SUCCESS INDICATORS
 
 ### **You're doing it RIGHT when:**
+
 - ✅ Domain objects remain exactly as documented
 - ✅ Business rules are implemented without modification
 - ✅ Event sourcing works without schema changes
@@ -376,8 +411,9 @@ public record ApplicationCreated : IDomainEvent
 - ✅ Pull requests focus on application/infrastructure layers
 
 ### **System Health Metrics:**
+
 - 🔒 **Domain Stability**: No unplanned domain modifications
-- 🧪 **Test Coverage**: Domain specifications as test cases  
+- 🧪 **Test Coverage**: Domain specifications as test cases
 - 🔄 **Event Compatibility**: All events deserialize correctly
 - 📈 **Development Velocity**: Fast feature delivery without domain rework
 - 👥 **Team Alignment**: Consistent domain understanding

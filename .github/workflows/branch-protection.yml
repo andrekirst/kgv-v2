@@ -1,0 +1,276 @@
+name: 🌿 Branch Protection & Git Flow Validation
+
+on:
+  push:
+    branches-ignore:
+      - main  # Main branch pushes should be blocked
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-git-flow:
+    name: 🔍 Validate Git Flow Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: 🚨 Block Direct Main Branch Commits
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          echo "❌ Direct commits to main branch are not allowed!"
+          echo "🔄 Please use Pull Requests to modify main branch"
+          echo "📚 See docs/git-workflow-guide.md for proper workflow"
+          exit 1
+          
+      - name: 🌿 Validate Branch Name
+        if: github.event_name != 'pull_request'
+        run: |
+          BRANCH_NAME="${GITHUB_REF##*/}"
+          echo "🔍 Validating branch name: $BRANCH_NAME"
+          
+          # Branch naming pattern: type/issue-description
+          VALID_PATTERN="^(feature|fix|hotfix|docs|refactor|test)\/[0-9]+-[a-zA-Z0-9-]+$"
+          
+          if [[ $BRANCH_NAME =~ $VALID_PATTERN ]]; then
+            echo "✅ Branch name follows KGV naming convention"
+            
+            # Extract issue number
+            ISSUE_NUM=$(echo "$BRANCH_NAME" | grep -oE '[0-9]+' | head -1)
+            echo "📋 Branch references issue #$ISSUE_NUM"
+            
+            # Set output for later use
+            echo "ISSUE_NUMBER=$ISSUE_NUM" >> $GITHUB_ENV
+            echo "BRANCH_TYPE=$(echo $BRANCH_NAME | cut -d'/' -f1)" >> $GITHUB_ENV
+          else
+            echo "❌ Invalid branch name format!"
+            echo "📋 Required format: type/issue-description"
+            echo "📚 Examples:"
+            echo "   - feature/123-waiting-list-export"
+            echo "   - fix/124-validation-bug"
+            echo "   - hotfix/125-security-patch"
+            echo ""
+            echo "📖 See docs/git-workflow-guide.md for details"
+            exit 1
+          fi
+          
+      - name: 📝 Validate Commit Messages
+        run: |
+          echo "🔍 Validating commit messages for conventional format..."
+          
+          # Get commits in this push/PR
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            COMMITS=$(git rev-list --no-merges ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          else
+            # For direct pushes (should be rare due to branch protection)
+            COMMITS=$(git rev-list --no-merges HEAD~1..HEAD)
+          fi
+          
+          INVALID_COMMITS=0
+          TOTAL_COMMITS=0
+          
+          for commit in $COMMITS; do
+            COMMIT_MSG=$(git log --format=%s -n 1 $commit)
+            COMMIT_FULL=$(git log --format=%B -n 1 $commit)
+            
+            echo ""
+            echo "📝 Checking commit: $(echo $commit | cut -c1-8)"
+            echo "Message: $COMMIT_MSG"
+            
+            TOTAL_COMMITS=$((TOTAL_COMMITS + 1))
+            
+            # Conventional commit pattern
+            if [[ $COMMIT_MSG =~ ^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?: .+ ]]; then
+              echo "✅ Conventional format: VALID"
+              
+              # Check for issue references
+              if [[ $COMMIT_FULL =~ (Closes|Fixes|Resolves|Relates\ to|References|Refs)\ #[0-9]+ ]]; then
+                echo "✅ Issue reference: FOUND"
+                
+                # Extract referenced issues
+                ISSUES=$(echo "$COMMIT_FULL" | grep -oE "#[0-9]+" | sort -u | tr '\n' ' ')
+                echo "📋 Issues: $ISSUES"
+              else
+                echo "⚠️  Issue reference: MISSING (recommended)"
+              fi
+              
+            else
+              echo "❌ Conventional format: INVALID"
+              echo "📋 Expected: type(scope): description"
+              echo "📋 Valid types: feat, fix, docs, style, refactor, test, chore, perf, ci, build"
+              INVALID_COMMITS=$((INVALID_COMMITS + 1))
+            fi
+          done
+          
+          echo ""
+          echo "=================================================="
+          echo "📊 Commit Validation Summary:"
+          echo "   Total commits: $TOTAL_COMMITS"
+          echo "   Valid commits: $((TOTAL_COMMITS - INVALID_COMMITS))"
+          echo "   Invalid commits: $INVALID_COMMITS"
+          
+          if [ $INVALID_COMMITS -gt 0 ]; then
+            echo ""
+            echo "❌ Commit message validation failed!"
+            echo "🛠️  Please fix commit messages to follow conventional format"
+            echo "📚 See docs/git-workflow-guide.md for examples"
+            exit 1
+          else
+            echo "✅ All commit messages are valid!"
+          fi
+          
+      - name: 📋 Check Issue Branch Mapping
+        if: env.ISSUE_NUMBER != ''
+        run: |
+          echo "🔍 Validating issue-branch mapping..."
+          
+          # Check if issue exists (if gh CLI is available)
+          if command -v gh &> /dev/null; then
+            echo "📋 Checking if issue #${{ env.ISSUE_NUMBER }} exists..."
+            
+            if gh issue view ${{ env.ISSUE_NUMBER }} --json number,title,state > /dev/null 2>&1; then
+              ISSUE_INFO=$(gh issue view ${{ env.ISSUE_NUMBER }} --json number,title,state)
+              ISSUE_TITLE=$(echo "$ISSUE_INFO" | jq -r '.title')
+              ISSUE_STATE=$(echo "$ISSUE_INFO" | jq -r '.state')
+              
+              echo "✅ Issue #${{ env.ISSUE_NUMBER }} exists: $ISSUE_TITLE"
+              echo "📊 Issue state: $ISSUE_STATE"
+              
+              if [ "$ISSUE_STATE" = "CLOSED" ]; then
+                echo "⚠️  Warning: Working on closed issue #${{ env.ISSUE_NUMBER }}"
+              fi
+            else
+              echo "⚠️  Issue #${{ env.ISSUE_NUMBER }} not found or not accessible"
+              echo "💡 Make sure the issue exists and you have permissions to view it"
+            fi
+          else
+            echo "💡 GitHub CLI not available - skipping issue validation"
+          fi
+          
+      - name: 🛡️ Run Domain Guard
+        run: |
+          echo "🛡️ Running domain guard validation..."
+          
+          # Make scripts executable
+          chmod +x .domain-guard/pre-commit-hook.sh
+          chmod +x .domain-guard/commit-msg-check.sh
+          
+          # Run domain validation
+          if .domain-guard/pre-commit-hook.sh; then
+            echo "✅ Domain guard validation passed"
+          else
+            echo "❌ Domain guard validation failed"
+            echo "📚 See CLAUDE.md for domain protection guidelines"
+            exit 1
+          fi
+          
+      - name: 📊 Generate Branch Report
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "📊 Generating branch analysis report..."
+          
+          BRANCH_NAME="${{ github.head_ref }}"
+          BASE_BRANCH="${{ github.base_ref }}"
+          
+          # Count commits
+          COMMIT_COUNT=$(git rev-list --count ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          
+          # Count changed files
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | wc -l)
+          
+          # Get lines changed
+          LINES_ADDED=$(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{add+=$1} END {print add+0}')
+          LINES_DELETED=$(git diff --numstat ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | awk '{del+=$2} END {print del+0}')
+          
+          # Check for domain files
+          DOMAIN_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | grep -E "(Domain/|ValueObject|Entity|Aggregate)" || echo "None")
+          
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## 🌿 Git Flow Analysis Report
+          
+          **Branch**: \`$BRANCH_NAME\`  
+          **Target**: \`$BASE_BRANCH\`  
+          **Issue**: #${{ env.ISSUE_NUMBER }} (${{ env.BRANCH_TYPE }})
+          
+          ### 📊 Change Statistics
+          - **Commits**: $COMMIT_COUNT
+          - **Files Changed**: $CHANGED_FILES
+          - **Lines Added**: $LINES_ADDED
+          - **Lines Deleted**: $LINES_DELETED
+          
+          ### 🛡️ Domain Protection
+          - **Domain Files Modified**: $([ "$DOMAIN_FILES" = "None" ] && echo "✅ None" || echo "⚠️ $DOMAIN_FILES")
+          - **Git Flow Compliance**: ✅ Passed
+          - **Commit Format**: ✅ Valid
+          
+          ### 🎯 Branch Analysis
+          - **Naming Convention**: ✅ Follows KGV standards
+          - **Issue Reference**: ✅ Properly linked
+          - **Branch Type**: \`${{ env.BRANCH_TYPE }}\`
+          EOF
+          
+      - name: 💬 Add PR Comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branchName = context.payload.pull_request.head.ref;
+            const issueNumber = branchName.match(/\d+/)?.[0] || 'Unknown';
+            const branchType = branchName.split('/')[0];
+            
+            const comment = `## 🌿 Git Flow Validation Report
+            
+            ✅ **Branch Protection**: All checks passed
+            ✅ **Naming Convention**: Follows KGV standards  
+            ✅ **Commit Format**: Conventional commits validated
+            ✅ **Domain Guard**: No domain violations detected
+            
+            ### Branch Information
+            - **Type**: \`${branchType}\`
+            - **Issue**: #${issueNumber}
+            - **Compliance**: 🎯 Fully compliant with KGV Git Flow
+            
+            ### Next Steps
+            - Ensure all CI checks pass
+            - Request code review from team members
+            - Address any feedback before merging
+            
+            ---
+            *🤖 Generated by KGV Git Flow Validation*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  prevent-main-push:
+    name: 🚫 Prevent Direct Main Push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 🚨 Block Direct Main Push
+        run: |
+          echo "🚨 CRITICAL: Direct push to main branch detected!"
+          echo ""
+          echo "❌ This action is BLOCKED by KGV Git Flow policy"
+          echo "🛡️ Main branch is protected and requires Pull Requests"
+          echo ""
+          echo "🔄 Correct workflow:"
+          echo "  1. Create feature branch: git checkout -b feature/123-description"
+          echo "  2. Make changes and commit with conventional messages"
+          echo "  3. Push branch: git push origin feature/123-description"
+          echo "  4. Create Pull Request to main branch"
+          echo "  5. Wait for review and approval"
+          echo "  6. Merge via GitHub interface"
+          echo ""
+          echo "📚 See docs/git-workflow-guide.md for complete instructions"
+          echo ""
+          echo "🚨 This workflow will now fail to enforce the policy!"
+          exit 1

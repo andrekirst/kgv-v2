@@ -23,6 +23,7 @@
 - **[UX Design Guide](ux-design-guide.md)** - 🎨 BITV 2.0 compliant UX
 
 ### 🔧 **Implementation Guides**
+- **[Git Workflow Guide](git-workflow-guide.md)** - 🌿 Branch protection & commit standards
 - **[API Documentation](api-documentation.md)** - 🌐 RESTful API specifications
 - **[Database Schema](database-schema.md)** - 🗃️ Entity Framework configurations
 - **[Testing Strategy](testing-strategy.md)** - 🧪 Unit, integration & E2E tests
@@ -38,9 +39,10 @@
 ```bash
 # Before any development work:
 1. Read CLAUDE.md domain protection guidelines
-2. Review domain-model-documentation.md for specifications  
-3. Follow development-workflow.md for safe implementation
-4. Install domain protection: .domain-guard/install-hooks.sh
+2. Review domain-model-documentation.md for specifications
+3. Read docs/git-workflow-guide.md for Git workflow
+4. Install protection: .domain-guard/install-hooks.sh
+5. Configure GitHub branch protection rules
 ```
 
 ### **Compliance Score**: ![95%](https://img.shields.io/badge/95%25-Excellent-green)

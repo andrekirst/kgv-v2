@@ -11,7 +11,16 @@ mkdir -p .git/hooks
 cp .domain-guard/pre-commit-hook.sh .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 
+# Create commit-msg hook
+cat > .git/hooks/commit-msg << 'EOF'
+#!/bin/bash
+# KGV Commit Message Validation Hook
+exec .domain-guard/commit-msg-check.sh "$1"
+EOF
+chmod +x .git/hooks/commit-msg
+
 echo "✅ Pre-commit hook installed"
+echo "✅ Commit-msg hook installed"
 
 # Create domain guard configuration
 if [ ! -f ".domain-guard/config.json" ]; then
