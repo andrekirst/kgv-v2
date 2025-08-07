@@ -260,6 +260,24 @@ EOF
 
 **CRITICAL**: Never create PRs without proper issue linking, labels, milestones, and project assignment!
 
+### **Phase 5: Git Push (MANDATORY)**
+
+After EVERY successful commit, ALWAYS push the changes to the remote repository immediately:
+
+1. 🚀 **Automatic Push**: After `git commit`, immediately run `git push`
+2. 🔄 **Never accumulate commits**: Each commit should be pushed immediately  
+3. 📡 **Remote sync**: Ensure all changes are backed up and available to team
+4. ✅ **Workflow completion**: A commit is not complete until it's pushed
+
+**Command sequence:**
+```bash
+git add [files]
+git commit -m "commit message"
+git push  # ← MANDATORY: Always push immediately after commit
+```
+
+**CRITICAL**: Every commit must be followed by an immediate push to maintain workflow integrity!
+
 ---
 
 ## 🚨 DOMAIN CHANGE PROTOCOL
