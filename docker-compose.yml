@@ -1,0 +1,119 @@
+# KGV-v2 Development Environment
+# This docker-compose file sets up the development environment for the KGV system
+
+version: '3.8'
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: kgv-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=KgvDev123!Strong
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./tools/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - kgv-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "KgvDev123!Strong", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache (optional - for session storage, caching)
+  redis:
+    image: redis:7-alpine
+    container_name: kgv-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - kgv-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass "KgvRedisPass123"
+
+  # MailHog - Email testing in development
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: kgv-mailhog
+    ports:
+      - "1025:1025"  # SMTP server
+      - "8025:8025"  # Web interface
+    networks:
+      - kgv-network
+    restart: unless-stopped
+
+  # pgAdmin (if using PostgreSQL instead of SQL Server)
+  # Uncomment if you prefer PostgreSQL
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: kgv-postgres
+  #   environment:
+  #     - POSTGRES_DB=kgv_database
+  #     - POSTGRES_USER=kgv_user
+  #     - POSTGRES_PASSWORD=KgvPostgres123!
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./tools/database/postgres-init:/docker-entrypoint-initdb.d
+  #   networks:
+  #     - kgv-network
+  #   restart: unless-stopped
+
+  # pgAdmin - PostgreSQL Administration (if using PostgreSQL)
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: kgv-pgadmin
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=admin@kgv.local
+  #     - PGADMIN_DEFAULT_PASSWORD=admin123
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - pgadmin_data:/var/lib/pgadmin
+  #   networks:
+  #     - kgv-network
+  #   depends_on:
+  #     - postgres
+
+  # Seq - Structured logging (optional)
+  seq:
+    image: datalust/seq:latest
+    container_name: kgv-seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:80"     # Web interface
+      - "5342:5341"   # Ingestion
+    volumes:
+      - seq_data:/data
+    networks:
+      - kgv-network
+    restart: unless-stopped
+
+volumes:
+  sqlserver_data:
+    driver: local
+  redis_data:
+    driver: local
+  seq_data:
+    driver: local
+  # postgres_data:
+  #   driver: local
+  # pgadmin_data:
+  #   driver: local
+
+networks:
+  kgv-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

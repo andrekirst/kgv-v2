@@ -1,0 +1,125 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🌐 Launch Backend API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-backend",
+      "program": "${workspaceFolder}/src/backend/KGV.WebApi/bin/Debug/net9.0/KGV.WebApi.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/backend/KGV.WebApi",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:7001;http://localhost:5000"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/src/backend/KGV.WebApi/Views"
+      }
+    },
+    {
+      "name": "🖥️ Launch Angular Frontend",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/src/frontend",
+      "program": "${workspaceFolder}/src/frontend/node_modules/@angular/cli/bin/ng",
+      "args": [
+        "serve",
+        "--port=4200",
+        "--host=localhost",
+        "--open"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "🔗 Launch Full Stack (Backend + Frontend)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/scripts/start-dev.js",
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "🧪 Debug Backend Tests",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-backend-tests",
+      "program": "${workspaceFolder}/tests/backend/KGV.Application.Tests/bin/Debug/net9.0/KGV.Application.Tests.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/tests/backend/KGV.Application.Tests",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Testing"
+      }
+    },
+    {
+      "name": "🧪 Debug Frontend Tests (Jest)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/src/frontend",
+      "program": "${workspaceFolder}/src/frontend/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-cache"
+      ],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "🐳 Attach to Backend in Docker",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickRemoteProcess}",
+      "sourceFileMap": {
+        "/src": "${workspaceFolder}/src/backend"
+      },
+      "justMyCode": false
+    },
+    {
+      "name": "🌐 Debug Web API Integration Tests",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-webapi-tests",
+      "program": "${workspaceFolder}/tests/backend/KGV.WebApi.Tests/bin/Debug/net9.0/KGV.WebApi.Tests.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/tests/backend/KGV.WebApi.Tests",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Testing",
+        "ConnectionStrings__DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=KgvTestDatabase;Trusted_Connection=true;"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🚀 Full Stack Development",
+      "configurations": [
+        "🌐 Launch Backend API",
+        "🖥️ Launch Angular Frontend"
+      ],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "development",
+        "order": 1
+      }
+    }
+  ]
+}

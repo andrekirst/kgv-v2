@@ -29,16 +29,16 @@ body:
       label: 🏷️ Task Type
       description: What kind of task is this?
       options:
-        - "🛠️ Infrastructure/DevOps"
-        - "📚 Documentation"
-        - "🔧 Configuration/Setup"
-        - "🧪 Testing Infrastructure"
-        - "🔐 Security/Compliance"
-        - "📈 Monitoring/Logging"
-        - "🔄 Refactoring"
-        - "🧹 Code Cleanup"
-        - "📦 Dependencies/Libraries"
-        - "🎨 Design System/UI"
+        - "🛠️ Infrastructure/DevOps (.github/, docker-compose, scripts/)"
+        - "📚 Documentation (docs/)"
+        - "🔧 Configuration/Setup (src/backend/appsettings.json, src/frontend/angular.json)"
+        - "🧪 Testing Infrastructure (tests/)"
+        - "🔐 Security/Compliance (src/backend/KGV.Infrastructure/Identity/)"
+        - "📈 Monitoring/Logging (src/backend/KGV.WebApi/middleware/)"
+        - "🔄 Refactoring (existing code improvement)"
+        - "🧹 Code Cleanup (code quality, linting)"
+        - "📦 Dependencies/Libraries (package.json, .csproj files)"
+        - "🎨 Design System/UI (src/frontend/src/assets/styles/)"
     validations:
       required: true
 

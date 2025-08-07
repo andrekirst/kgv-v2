@@ -29,15 +29,15 @@ body:
       label: 🎯 Affected Component
       description: Which part of the system has the bug?
       options:
-        - "Backend API (Controller/Service)"
-        - "Backend Business Logic (Application Layer)"
-        - "Backend Domain Logic (Domain Layer)"
-        - "Backend Database (Entity Framework/SQL)"
-        - "Frontend UI (Angular Components)"
-        - "Frontend State Management (NgRx)"
-        - "Frontend Forms/Validation"
-        - "Integration (Backend ↔ Frontend)"
-        - "Authentication/Authorization"
+        - "Backend API (src/backend/KGV.WebApi/Controllers/)"
+        - "Backend Business Logic (src/backend/KGV.Application/)"
+        - "Backend Domain Logic (src/backend/KGV.Domain/) ⚠️"
+        - "Backend Database (src/backend/KGV.Infrastructure/Persistence/)"
+        - "Frontend UI (src/frontend/src/app/features/)"
+        - "Frontend State Management (src/frontend/src/app/*/store/)"
+        - "Frontend Forms/Validation (src/frontend/src/app/shared/validators/)"
+        - "Integration (Backend ↔ Frontend API calls)"
+        - "Authentication/Authorization (src/backend/KGV.Infrastructure/Identity/)"
         - "Other/Unknown"
     validations:
       required: true

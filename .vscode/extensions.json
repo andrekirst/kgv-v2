@@ -1,0 +1,77 @@
+{
+  "recommendations": [
+    // Angular Development
+    "angular.ng-template",
+    "ms-vscode.vscode-typescript-next",
+    "johnpapa.angular2",
+    "cyrilletuzi.angular-schematics",
+
+    // .NET Development
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.vscode-dotnet-runtime",
+    "ms-dotnettools.vscodeintellicode-csharp",
+    "ms-dotnettools.blazorwasm-companion",
+
+    // Code Quality & Formatting
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-eslint",
+    "streetsidesoftware.code-spell-checker",
+    "ms-vsliveshare.vsliveshare",
+
+    // Database & SQL
+    "ms-mssql.mssql",
+    "ms-ossdata.vscode-postgresql",
+
+    // Docker & DevOps
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers",
+    "ms-vscode-remote.remote-wsl",
+
+    // Git & Version Control
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    "github.copilot",
+
+    // Testing
+    "ms-dotnettools.dotnet-test-explorer",
+    "orta.vscode-jest",
+    "hbenl.vscode-test-explorer",
+
+    // Utilities
+    "ms-vscode.powershell",
+    "bradlc.vscode-tailwindcss",
+    "redhat.vscode-yaml",
+    "ms-vscode.vscode-json",
+
+    // Theme & UI
+    "pkief.material-icon-theme",
+    "zhuangtongfa.material-theme",
+
+    // Markdown & Documentation
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+
+    // REST API Testing
+    "humao.rest-client",
+    "rangav.vscode-thunder-client",
+
+    // HTML/CSS
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss",
+    "zignd.html-css-class-completion",
+
+    // Productivity
+    "alefragnani.bookmarks",
+    "gruntfuggly.todo-tree",
+    "aaron-bond.better-comments",
+    "christian-kohler.path-intellisense",
+
+    // Linting & Analysis
+    "sonarsource.sonarlint-vscode",
+    "ms-vscode.vscode-serial-monitor"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "hookyqr.beautify"
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  // General Editor Settings
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "editor.rulers": [120],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+
+  // File Associations
+  "files.associations": {
+    "*.yml": "yaml",
+    "*.yaml": "yaml",
+    "Dockerfile*": "dockerfile",
+    ".editorconfig": "editorconfig"
+  },
+
+  // File Exclusions for Explorer
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/.angular": true,
+    "**/.vscode": false,
+    "**/.git": true,
+    "**/coverage": true,
+    "**/TestResults": true,
+    "**/*.user": true,
+    "**/*.userosscache": true,
+    "**/*.suo": true,
+    "**/*.suo.*": true,
+    "**/logs": true,
+    "**/temp": true,
+    "**/tmp": true
+  },
+
+  // Search Exclusions
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/bin": true,
+    "**/obj": true,
+    "**/.angular": true,
+    "**/coverage": true,
+    "**/TestResults": true,
+    "**/logs": true
+  },
+
+  // TypeScript Settings
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+
+  // Angular Specific
+  "angular.enable-experimental-ivy-prompt": false,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+
+  // C# Settings
+  "dotnet.defaultSolution": "src/backend/KGV.sln",
+  "omnisharp.enableRoslynAnalyzers": true,
+  "omnisharp.enableImportCompletion": true,
+  "omnisharp.organizeImportsOnFormat": true,
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+
+  // ESLint Settings
+  "eslint.workingDirectories": [
+    "./src/frontend"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "html"
+  ],
+
+  // Prettier Settings
+  "prettier.configPath": "./src/frontend/.prettierrc",
+  "prettier.ignorePath": "./src/frontend/.prettierignore",
+
+  // Terminal Settings
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+
+  // Git Settings
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.postCommitCommand": "none",
+
+  // Extensions Settings
+  "emmet.includeLanguages": {
+    "typescript": "html",
+    "javascript": "html"
+  },
+
+  // SQL Settings
+  "[sql]": {
+    "editor.tabSize": 2
+  },
+
+  // YAML Settings
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.tabSize": 2
+  },
+
+  // Markdown Settings
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+
+  // Docker Settings
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+
+  // HTML Settings
+  "html.format.indentInnerHtml": true,
+  "html.format.indentHandlebars": true,
+
+  // CSS/SCSS Settings
+  "css.validate": true,
+  "scss.validate": true,
+
+  // Auto Save
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+
+  // Breadcrumbs
+  "breadcrumbs.enabled": true,
+  "breadcrumbs.symbolPath": "on",
+
+  // Workspace Trust
+  "security.workspace.trust.untrustedFiles": "open",
+
+  // Extension Recommendations
+  "extensions.ignoreRecommendations": false
+}

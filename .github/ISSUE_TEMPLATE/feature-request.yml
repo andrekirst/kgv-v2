@@ -73,38 +73,49 @@ body:
   - type: textarea
     id: backend-tasks
     attributes:
-      label: 🏗️ Backend Technical Tasks
+      label: 🏗️ Backend Technical Tasks (src/backend/)
       description: Specific backend tasks to implement this feature
       placeholder: |
-        - [ ] Create new controller with endpoints
-        - [ ] Implement command/query handlers
-        - [ ] Add DTOs and mapping
-        - [ ] Create database entities/migrations
-        - [ ] Write unit tests
+        - [ ] Create controller in src/backend/KGV.WebApi/Controllers/
+        - [ ] Implement commands/queries in src/backend/KGV.Application/
+        - [ ] Add DTOs in src/backend/KGV.Application/DTOs/
+        - [ ] Create entities in src/backend/KGV.Domain/ (if needed)
+        - [ ] Database migrations in src/backend/KGV.Infrastructure/Persistence/
+        - [ ] Write tests in tests/backend/
       value: |
-        - [ ] Create controller endpoints
-        - [ ] Implement business logic in application layer  
-        - [ ] Add data models and DTOs
-        - [ ] Database changes (if needed)
-        - [ ] Write unit tests
+        ### Backend Implementation (src/backend/)
+        - [ ] **Controller**: Create in `KGV.WebApi/Controllers/[FeatureName]Controller.cs`
+        - [ ] **Commands/Queries**: Implement in `KGV.Application/Commands/` and `KGV.Application/Queries/`
+        - [ ] **Handlers**: Add in `KGV.Application/Handlers/[FeatureName]/`
+        - [ ] **DTOs**: Define in `KGV.Application/DTOs/[FeatureName]/`
+        - [ ] **Domain**: Entities in `KGV.Domain/Entities/` (⚠️ if needed - domain review required)
+        - [ ] **Infrastructure**: Repository implementations in `KGV.Infrastructure/Persistence/Repositories/`
+        - [ ] **Database**: Migrations in `KGV.Infrastructure/Persistence/Migrations/`
+        - [ ] **Tests**: Unit tests in `src/backend/KGV.Application.Tests/` and `src/backend/KGV.WebApi.Tests/`
 
   - type: textarea
     id: frontend-tasks
     attributes:
-      label: 🖥️ Frontend Technical Tasks
+      label: 🖥️ Frontend Technical Tasks (src/frontend/)
       description: Specific frontend tasks to implement this feature
       placeholder: |
-        - [ ] Create Angular components
+        - [ ] Create components in src/frontend/src/app/features/[feature]/
+        - [ ] Add services in src/frontend/src/app/features/[feature]/services/
         - [ ] Implement forms and validation
-        - [ ] Add state management
+        - [ ] Add routing in [feature]-routing.module.ts
         - [ ] Style with Angular Material
-        - [ ] Write component tests
+        - [ ] Write tests in tests/frontend/
       value: |
-        - [ ] Create UI components
-        - [ ] Implement state management
-        - [ ] Add form validation and error handling
-        - [ ] Style according to design system
-        - [ ] Write component tests
+        ### Frontend Implementation (src/frontend/)
+        - [ ] **Feature Module**: Create in `src/app/features/[feature-name]/[feature-name].module.ts`
+        - [ ] **Components**: Add in `src/app/features/[feature-name]/components/`
+        - [ ] **Services**: Implement in `src/app/features/[feature-name]/services/[feature-name]-api.service.ts`
+        - [ ] **Models**: Define in `src/app/features/[feature-name]/models/`
+        - [ ] **Routing**: Configure in `src/app/features/[feature-name]/[feature-name]-routing.module.ts`
+        - [ ] **Forms**: Create reactive forms with validation in components
+        - [ ] **State Management**: Add NgRx if complex, otherwise use services
+        - [ ] **Styling**: Use Angular Material components with custom SCSS
+        - [ ] **Tests**: Unit tests in `tests/unit/` and component tests
 
   - type: dropdown
     id: estimated-size
