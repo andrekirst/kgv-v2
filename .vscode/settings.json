@@ -88,8 +88,6 @@
   // C# Settings
   "dotnet.defaultSolution": "src/backend/KGV.sln",
   "omnisharp.enableRoslynAnalyzers": true,
-  "omnisharp.enableImportCompletion": true,
-  "omnisharp.organizeImportsOnFormat": true,
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp",
     "editor.tabSize": 4,
@@ -173,5 +171,7 @@
   "security.workspace.trust.untrustedFiles": "open",
 
   // Extension Recommendations
-  "extensions.ignoreRecommendations": false
+  "extensions.ignoreRecommendations": false,
+  "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+  "dotnet.formatting.organizeImportsOnFormat": true
 }
