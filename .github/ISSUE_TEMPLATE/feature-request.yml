@@ -1,0 +1,165 @@
+name: 🚀 Feature Request (Backend + Frontend)
+description: Create a new feature that includes both backend and frontend components
+title: "feat: [Feature Name] - [Short Description]"
+labels: ["feature", "needs-sizing", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🚀 Feature Request
+        
+        **Important**: Feature issues should always include BOTH backend and frontend components and take maximum 1-2 days to implement.
+        
+        Please fill out this template completely to help us understand and implement your feature request.
+
+  - type: input
+    id: feature-name
+    attributes:
+      label: Feature Name
+      description: Short, descriptive name for the feature
+      placeholder: e.g., "Waiting List Export"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📋 Description
+      description: Clear description of the feature and its business value
+      placeholder: Describe what this feature does and why it's needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: 👤 User Story
+      description: Describe the feature from the user's perspective
+      placeholder: "As a [user type], I want to [do something] so that I can [achieve goal]"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: acceptance-criteria
+    attributes:
+      label: 🎯 Acceptance Criteria
+      description: Define what "done" looks like for this feature
+      options:
+        - label: "Backend: API endpoints implemented with proper error handling"
+          required: false
+        - label: "Backend: Business logic implemented in application layer"
+          required: false
+        - label: "Backend: Database changes (if needed) with migrations"
+          required: false
+        - label: "Backend: Unit tests added with >80% coverage"
+          required: false
+        - label: "Frontend: UI components created following design system"
+          required: false
+        - label: "Frontend: State management implemented (NgRx if complex)"
+          required: false
+        - label: "Frontend: Form validation and error handling"
+          required: false
+        - label: "Frontend: Component tests added"
+          required: false
+        - label: "Integration: Backend and frontend properly integrated"
+          required: false
+        - label: "Documentation: API documentation updated (OpenAPI/Swagger)"
+          required: false
+        - label: "Domain Guard: No protected domain model modifications"
+          required: false
+
+  - type: textarea
+    id: backend-tasks
+    attributes:
+      label: 🏗️ Backend Technical Tasks
+      description: Specific backend tasks to implement this feature
+      placeholder: |
+        - [ ] Create new controller with endpoints
+        - [ ] Implement command/query handlers
+        - [ ] Add DTOs and mapping
+        - [ ] Create database entities/migrations
+        - [ ] Write unit tests
+      value: |
+        - [ ] Create controller endpoints
+        - [ ] Implement business logic in application layer  
+        - [ ] Add data models and DTOs
+        - [ ] Database changes (if needed)
+        - [ ] Write unit tests
+
+  - type: textarea
+    id: frontend-tasks
+    attributes:
+      label: 🖥️ Frontend Technical Tasks
+      description: Specific frontend tasks to implement this feature
+      placeholder: |
+        - [ ] Create Angular components
+        - [ ] Implement forms and validation
+        - [ ] Add state management
+        - [ ] Style with Angular Material
+        - [ ] Write component tests
+      value: |
+        - [ ] Create UI components
+        - [ ] Implement state management
+        - [ ] Add form validation and error handling
+        - [ ] Style according to design system
+        - [ ] Write component tests
+
+  - type: dropdown
+    id: estimated-size
+    attributes:
+      label: 📊 Size Estimation
+      description: How long do you estimate this will take to implement?
+      options:
+        - "1 day (size/S)"
+        - "1.5 days (size/M)"
+        - "2 days (size/L)"
+        - "> 2 days (SPLIT REQUIRED!)"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: components-affected
+    attributes:
+      label: 🏷️ Components Affected
+      description: Which parts of the system will this feature touch?
+      options:
+        - label: "Domain Layer (⚠️ Requires special approval - see CLAUDE.md)"
+        - label: "Application Layer (Business logic)"
+        - label: "API Layer (Controllers, endpoints)"
+        - label: "Frontend (Angular components)"
+        - label: "Database (Schema changes, migrations)"
+        - label: "Authentication/Authorization"
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: 🔗 Related Issues
+      description: Link any related issues or dependencies
+      placeholder: |
+        - Relates to #123
+        - Depends on #456
+        - Blocks #789
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: 📝 Additional Notes
+      description: Any other information that would help implement this feature
+      placeholder: Include mockups, API contracts, business rules, or other relevant details
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ Pre-submission Checklist
+      description: Please verify before submitting
+      options:
+        - label: "I have checked that this feature takes maximum 2 days to implement"
+          required: true
+        - label: "I have defined clear acceptance criteria"
+          required: true
+        - label: "I have considered both backend and frontend requirements"
+          required: true
+        - label: "I have checked if this affects the protected domain model (CLAUDE.md)"
+          required: true

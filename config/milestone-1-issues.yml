@@ -1,0 +1,467 @@
+milestone: "🏗️ M1: Foundation"
+description: "Technical foundation: Domain model, authentication, basic API endpoints"
+total_issues: 20
+total_dev_days: 40
+duration_weeks: 10
+
+issues:
+  - number: 1
+    title: "feat: Domain Value Objects - Aktenzeichen, PersonData, Address"
+    labels: ["feature", "size/L", "domain", "priority/critical", "domain-review"]
+    assignee: "andrekirst"
+    estimate_days: 2
+    dependencies: []
+    description: |
+      ## 🎯 Ziel
+      Domain Model Foundation mit den drei Kern Value Objects implementieren.
+
+      ## 📋 Backend Tasks (2 Tage)
+      - [ ] Aktenzeichen Value Object implementieren
+        - Pattern-Validation: `^(32\.2|33\.2)\s+(\d+)\s+(\d{4})$`
+        - Factory Methods: Create() und Parse()
+        - Business Rules: ListType-Mapping
+      - [ ] PersonData Value Object erstellen
+        - Validation: Min 18 Jahre, Email-Format
+        - Computed Properties: FullName
+        - Immutability gewährleisten
+      - [ ] Address Value Object implementieren
+        - Deutsche PLZ-Validierung (5 Ziffern)
+        - Normalisierte Datenstruktur
+        - FullAddress computed property
+      - [ ] Unit Tests für alle Value Objects (>90% Coverage)
+      - [ ] Domain Guard Validation durchlaufen
+
+    acceptance_criteria:
+      - "Alle Value Objects sind immutable (sealed records)"
+      - "Pattern-Matching für Aktenzeichen funktioniert"
+      - "Validierung wirft korrekte Exceptions"
+      - "Unit Tests decken alle Business Rules ab"
+      - "Keine Änderungen an CLAUDE.md-geschützten Bereichen"
+
+  - number: 2
+    title: "feat: EF Core Setup - DbContext, Entities, Migrations"
+    labels: ["feature", "size/S", "database", "priority/high", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 1
+    dependencies: [1]
+    description: |
+      ## 🎯 Ziel
+      Entity Framework Core Setup mit DbContext, Entitäten und Migrationen.
+
+      ## 📋 Backend Tasks (1 Tag)
+      - [ ] KgvDbContext erstellen mit DbSets
+      - [ ] Entity-Konfigurationen für Value Objects
+      - [ ] Application Entity mit Status-Enums
+      - [ ] WaitingList und WaitingListEntry Entities
+      - [ ] Initial Migration erstellen
+      - [ ] Seed-Data für Gemarkungen
+
+    acceptance_criteria:
+      - "Migrations laufen ohne Fehler"
+      - "Value Objects werden korrekt serialisiert/deserialisiert"
+      - "Foreign Key Constraints sind definiert"
+      - "Seed-Data wird korrekt geladen"
+
+  - number: 3
+    title: "feat: Repository Pattern - Generic Repository + Unit of Work"
+    labels: ["feature", "size/S", "application", "priority/high", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 1
+    dependencies: [2]
+    description: |
+      ## 🎯 Ziel
+      Repository Pattern mit Generic Repository und Unit of Work implementieren.
+
+      ## 📋 Backend Tasks (1 Tag)
+      - [ ] Generic Repository Interface und Implementation
+      - [ ] Specialized Repositories: ApplicationRepository, WaitingListRepository
+      - [ ] Unit of Work Pattern implementieren
+      - [ ] Repository Extensions für complex queries
+      - [ ] Integration Tests für Repository
+
+    acceptance_criteria:
+      - "Generic Repository funktioniert für alle Entities"
+      - "Complex Business Queries sind implementiert"
+      - "Unit of Work koordiniert Transaktionen korrekt"
+      - "Integration Tests bestehen"
+
+  - number: 4
+    title: "feat: CQRS Setup - MediatR Commands/Queries Infrastructure"
+    labels: ["feature", "size/M", "application", "priority/high", "domain-safe"]
+    assignee: "backend-lead"
+    estimate_days: 1.5
+    dependencies: [3]
+    description: |
+      ## 🎯 Ziel
+      CQRS Infrastructure mit MediatR, Commands, Queries und Pipeline-Behaviors.
+
+      ## 📋 Backend Tasks (1.5 Tage)
+      - [ ] MediatR Package konfigurieren
+      - [ ] Base Command/Query/Handler Classes
+      - [ ] Validation Pipeline mit FluentValidation
+      - [ ] Logging und Error-Handling Pipeline
+      - [ ] Example Command/Query für Application CRUD
+      - [ ] Unit Tests für Pipeline-Behavior
+
+    acceptance_criteria:
+      - "Commands und Queries funktionieren über MediatR"
+      - "Validation Pipeline fängt alle Validierungsfehler"
+      - "Logging erfasst alle Command/Query-Aktivitäten"
+      - "Error-Handling ist konsistent"
+
+  - number: 5
+    title: "feat: Domain Events - Event Publishing/Handling Infrastructure"
+    labels: ["feature", "size/M", "domain", "priority/high", "domain-review"]
+    assignee: "backend-developer"
+    estimate_days: 1.5
+    dependencies: [4]
+    description: |
+      ## 🎯 Ziel
+      Domain Events Infrastructure für Event Publishing und Handling.
+
+      ## 📋 Backend Tasks (1.5 Tage)
+      - [ ] IDomainEvent Interface definieren
+      - [ ] Domain Event Publisher implementieren
+      - [ ] Event Handler Registry
+      - [ ] ApplicationCreated, ApplicationStatusChanged Events
+      - [ ] Event Sourcing Vorbereitungen (Versioning)
+      - [ ] Integration Tests für Event Flow
+
+    acceptance_criteria:
+      - "Domain Events werden korrekt publiziert"
+      - "Event Handler werden automatisch registriert"
+      - "Event Versioning ist vorbereitet"
+      - "Events sind testbar und nachverfolgbar"
+
+  - number: 6
+    title: "feat: JWT Authentication - Token generation, validation, refresh"
+    labels: ["feature", "size/L", "auth", "priority/critical", "domain-safe"]
+    assignee: "fullstack-developer-1"
+    estimate_days: 2
+    dependencies: [2]
+    backend_tasks:
+      - "JWT Token-Generierung implementieren"
+      - "Token-Validation Middleware"
+      - "Refresh Token Mechanismus"
+      - "Claims-based Authorization Setup"
+      - "Login/Logout Endpoints"
+      - "Token Blacklisting für Logout"
+    frontend_tasks:
+      - "AuthService für Token-Management"
+      - "HTTP Interceptor für Authorization Headers"
+      - "Token-Refresh Logic"
+      - "Login/Logout Components (basic)"
+      - "Route Guards implementieren"
+
+  - number: 7
+    title: "feat: User Management - User Entity, basic CRUD"
+    labels: ["feature", "size/S", "auth", "priority/high", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 1
+    dependencies: [6]
+    description: |
+      ## 🎯 Ziel
+      User Management Foundation mit Entity, Repository und Services.
+
+      ## 📋 Backend Tasks (1 Tag)
+      - [ ] User Entity mit Rollen definieren
+      - [ ] User Repository und Services
+      - [ ] Password-Hashing mit bcrypt
+      - [ ] User CRUD Commands/Queries
+      - [ ] Basic User Management API Endpoints
+      - [ ] Unit Tests für User Services
+
+  - number: 8
+    title: "feat: Role-based Authorization - Roles, Permissions, Policies"
+    labels: ["feature", "size/M", "auth", "priority/high", "domain-safe"]
+    assignee: "fullstack-developer-1"
+    estimate_days: 1.5
+    dependencies: [7]
+    backend_tasks:
+      - "Role und Permission Entities"
+      - "Policy-based Authorization Setup"
+      - "Custom Authorization Attributes"
+      - "Admin, Sachbearbeiter, Bürger Rollen"
+      - "Permission-Matrix implementieren"
+    frontend_tasks:
+      - "Role-based Route Guards"
+      - "Component-Level Permission Checks"
+      - "UI Element Visibility basierend auf Rollen"
+
+  - number: 9
+    title: "feat: Security Middleware - Rate limiting, CORS, Headers"
+    labels: ["feature", "size/S", "api", "priority/medium", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 1
+    dependencies: [8]
+    description: |
+      ## 🎯 Ziel
+      Security Middleware für API-Schutz implementieren.
+
+      ## 📋 Backend Tasks (1 Tag)
+      - [ ] Rate Limiting implementieren
+      - [ ] CORS Policy konfigurieren
+      - [ ] Security Headers Middleware
+      - [ ] Request/Response Logging
+      - [ ] API Key Validation (für externe APIs)
+      - [ ] Security Integration Tests
+
+  - number: 10
+    title: "feat: Application CRUD API - Complete CRUD with validation"
+    labels: ["feature", "size/L", "api", "priority/critical", "domain-safe"]
+    assignee: "fullstack-developer-2"
+    estimate_days: 2
+    dependencies: [5, 9]
+    backend_tasks:
+      - "Application Controller mit allen CRUD Endpoints"
+      - "CreateApplicationCommand mit Validation"
+      - "UpdateApplicationCommand mit Business Rules"
+      - "GetApplicationQuery mit Paging/Filtering"
+      - "DeleteApplicationCommand (Soft Delete)"
+      - "Integration Tests für alle Endpoints"
+      - "OpenAPI/Swagger Dokumentation"
+    frontend_tasks:
+      - "ApplicationService für API Calls"
+      - "Basic DTOs/Models definieren"
+      - "Error-Handling für API Responses"
+      - "Loading States Management"
+
+  - number: 11
+    title: "feat: Application Status Management - Status changes with validation"
+    labels: ["feature", "size/M", "api", "priority/high", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 1.5
+    dependencies: [10]
+    description: |
+      ## 🎯 Ziel
+      Application Status Management mit State Machine Validation.
+
+      ## 📋 Backend Tasks (1.5 Tage)
+      - [ ] ChangeApplicationStatusCommand implementieren
+      - [ ] Status-Transition-Validierung (State Machine)
+      - [ ] ApplicationStatusChanged Domain Event
+      - [ ] Status History Tracking
+      - [ ] GetApplicationStatusHistoryQuery
+      - [ ] Status Change API Endpoints
+
+  - number: 12
+    title: "feat: Person Management API - Person CRUD with validation"
+    labels: ["feature", "size/S", "api", "priority/medium", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 1
+    dependencies: [1]
+    description: |
+      ## 🎯 Ziel
+      Person Management API mit PersonData Value Object Integration.
+
+      ## 📋 Backend Tasks (1 Tag)
+      - [ ] Person Controller und Endpoints
+      - [ ] PersonData Validation Rules
+      - [ ] Duplicate Person Detection
+      - [ ] Person Search/Filter Functionality
+      - [ ] Person-Address Relationship Management
+      - [ ] Unit Tests für Person-spezifische Logic
+
+  - number: 13
+    title: "feat: Waiting List Management - List management, ranking"
+    labels: ["feature", "size/L", "api", "priority/critical", "domain-safe"]
+    assignee: "fullstack-developer-2"
+    estimate_days: 2
+    dependencies: [1, 10]
+    backend_tasks:
+      - "WaitingList Controller mit CRUD"
+      - "AddToWaitingListCommand"
+      - "FIFO Ranking Algorithm implementieren"
+      - "RemoveFromWaitingListCommand mit Re-ranking"
+      - "GetWaitingListQuery mit Paging"
+      - "Ranking Recalculation Service"
+      - "Integration Tests für Ranking Logic"
+    frontend_tasks:
+      - "WaitingListService für API Integration"
+      - "Basic List Display Component"
+      - "Ranking Position Display"
+      - "Real-time Updates Setup (WebSocket Vorbereitung)"
+
+  - number: 14
+    title: "feat: Admin User Management API - Admin functions"
+    labels: ["feature", "size/S", "api", "priority/medium", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 1
+    dependencies: [8]
+    description: |
+      ## 🎯 Ziel
+      Admin-spezifische User Management Funktionen.
+
+      ## 📋 Backend Tasks (1 Tag)
+      - [ ] Admin-specific User Management Endpoints
+      - [ ] User Role Assignment API
+      - [ ] User Activity Tracking
+      - [ ] Password Reset Functionality
+      - [ ] User Account Activation/Deactivation
+      - [ ] Admin Dashboard Statistics API
+
+  - number: 15
+    title: "feat: Health Check API - Monitoring, diagnostics"
+    labels: ["feature", "size/XS", "api", "priority/low", "domain-safe"]
+    assignee: "backend-developer"
+    estimate_days: 0.5
+    dependencies: [2]
+    description: |
+      ## 🎯 Ziel
+      Health Check Endpoints für Monitoring und Diagnostics.
+
+      ## 📋 Backend Tasks (0.5 Tage)
+      - [ ] Basic Health Check Endpoint (/health)
+      - [ ] Database Connectivity Check
+      - [ ] External Services Health Check
+      - [ ] Version Information Endpoint
+      - [ ] System Status Dashboard API
+      - [ ] Monitoring Integration (準備)
+
+  - number: 16
+    title: "feat: Angular Foundation - CLI, Material, Routing"
+    labels: ["feature", "size/S", "frontend", "priority/critical", "domain-safe"]
+    assignee: "frontend-lead"
+    estimate_days: 1
+    dependencies: []
+    description: |
+      ## 🎯 Ziel
+      Angular Projekt-Foundation mit allen Grundkonfigurationen.
+
+      ## 📋 Frontend Tasks (1 Tag)
+      - [ ] Angular CLI Projekt erstellen (v18+)
+      - [ ] Angular Material Installation und Konfiguration
+      - [ ] Basic Routing Setup mit Lazy Loading
+      - [ ] SCSS Configuration und Theme Setup
+      - [ ] Environment-Konfiguration (dev/prod)
+      - [ ] Build-Optimization (Bundle Analyzer)
+      - [ ] PWA Service Worker Vorbereitung
+
+  - number: 17
+    title: "feat: Authentication Module - Login, JWT handling, Guards"
+    labels: ["feature", "size/L", "frontend", "priority/critical", "domain-safe"]
+    assignee: "frontend-developer"
+    estimate_days: 2
+    dependencies: [16, 6]
+    description: |
+      ## 🎯 Ziel
+      Vollständiges Authentication Module mit JWT Integration.
+
+      ## 📋 Frontend Tasks (2 Tage)
+      - [ ] Login Component mit Reactive Forms
+      - [ ] AuthService mit JWT Token Management
+      - [ ] HTTP Interceptor für Token-Injection
+      - [ ] AuthGuard für Route Protection
+      - [ ] Token-Refresh-Logic implementieren
+      - [ ] Logout-Functionality
+      - [ ] Login State Management (NgRx Setup)
+      - [ ] Component Tests für Auth Module
+
+  - number: 18
+    title: "feat: Main Layout - Header, Navigation, Footer"
+    labels: ["feature", "size/S", "frontend", "priority/high", "domain-safe"]
+    assignee: "frontend-developer"
+    estimate_days: 1
+    dependencies: [17]
+    description: |
+      ## 🎯 Ziel
+      Main Layout Components mit responsivem Design.
+
+      ## 📋 Frontend Tasks (1 Tag)
+      - [ ] App Layout Component mit Angular Material
+      - [ ] Header mit User-Info und Logout
+      - [ ] Navigation Sidebar mit Role-based Menu
+      - [ ] Footer mit System-Infos
+      - [ ] Responsive Breakpoints für Mobile
+      - [ ] Theme Toggle (Light/Dark Mode)
+      - [ ] Loading Indicator Component
+
+  - number: 19
+    title: "feat: Form Infrastructure - Reactive forms, validation"
+    labels: ["feature", "size/M", "frontend", "priority/high", "domain-safe"]
+    assignee: "frontend-lead"
+    estimate_days: 1.5
+    dependencies: [18]
+    description: |
+      ## 🎯 Ziel
+      Wiederverwendbare Form-Infrastruktur für KGV-spezifische Felder.
+
+      ## 📋 Frontend Tasks (1.5 Tage)
+      - [ ] Base Form Component mit Validation
+      - [ ] Custom Form Controls für KGV-spezifische Felder
+      - [ ] Aktenzeichen Input Component
+      - [ ] PersonData Form Component
+      - [ ] Address Form Component mit PLZ-Lookup
+      - [ ] Form Validation Service
+      - [ ] Error-Message Display System
+      - [ ] Form Components Testing
+
+  - number: 20
+    title: "feat: HTTP Infrastructure - Error handling, loading states"
+    labels: ["feature", "size/S", "frontend", "priority/medium", "domain-safe"]
+    assignee: "frontend-developer"
+    estimate_days: 1
+    dependencies: [17]
+    description: |
+      ## 🎯 Ziel
+      Robuste HTTP Infrastructure mit Error-Handling und Loading States.
+
+      ## 📋 Frontend Tasks (1 Tag)
+      - [ ] Global Error Handling Interceptor
+      - [ ] Loading State Interceptor
+      - [ ] API Base URL Configuration
+      - [ ] Retry Logic für fehlgeschlagene Requests
+      - [ ] Global Error Notification Service
+      - [ ] Request/Response Logging (Development)
+      - [ ] HTTP Client Testing Setup
+
+blocks:
+  domain_foundation:
+    title: "🏛️ Domain & Architecture Block"
+    issues: [1, 2, 3, 4, 5]
+    total_days: 7.5
+    description: "Core domain model and architectural foundation"
+
+  authentication_security:
+    title: "🔐 Authentication & Security Block"
+    issues: [6, 7, 8, 9]
+    total_days: 5.5
+    description: "Complete authentication and security infrastructure"
+
+  core_api_endpoints:
+    title: "🌐 Core API Endpoints Block"
+    issues: [10, 11, 12, 13, 14, 15]
+    total_days: 8.5
+    description: "Essential API endpoints for MVP functionality"
+
+  frontend_foundation:
+    title: "🖥️ Frontend Foundation Block"
+    issues: [16, 17, 18, 19, 20]
+    total_days: 6.5
+    description: "Angular foundation with authentication and forms"
+
+success_criteria:
+  quantitative:
+    - "20 von 20 Issues erfolgreich abgeschlossen"
+    - ">95% Test Coverage für Domain Model"
+    - "100% Domain Guard Compliance (keine Violations)"
+    - "API Response Time < 500ms für alle Endpoints"
+    - "Frontend Build Time < 60 Sekunden"
+    - "Zero Critical Security Issues in Audit"
+  
+  qualitative:
+    - "Domain Model entspricht exakt der Dokumentation"
+    - "Authentication ist produktionsbereit und sicher"
+    - "API Architecture ist erweiterbar und maintainable"
+    - "Frontend Foundation ermöglicht effiziente Feature-Entwicklung"
+    - "Team Velocity ist stabil und vorhersagbar"
+
+go_no_go_criteria:
+  go:
+    - "Alle Issues abgeschlossen"
+    - "Tests bestehen"
+    - "Stakeholder zufrieden"
+  no_go:
+    - ">2 Issues offen"
+    - "Domain Guard Violations"
+    - "Kritische Bugs vorhanden"

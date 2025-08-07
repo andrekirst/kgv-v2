@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/andrekirst/kgv-v2/blob/main/docs/README.md
+    about: Check our comprehensive documentation first
+  - name: 🛡️ Domain Protection Guide
+    url: https://github.com/andrekirst/kgv-v2/blob/main/CLAUDE.md
+    about: Essential reading for domain model work
+  - name: 🌿 Git Workflow Guide
+    url: https://github.com/andrekirst/kgv-v2/blob/main/docs/git-workflow-guide.md
+    about: Learn our git workflow and branch management
+  - name: 📋 Project Management Guide
+    url: https://github.com/andrekirst/kgv-v2/blob/main/docs/project-management-guide.md
+    about: Understanding our issue management and milestones

@@ -1,0 +1,319 @@
+{
+  "project": {
+    "name": "KGV-v2 Development",
+    "description": "Comprehensive project management for KGV system migration from legacy VB to modern .NET 9 + Angular",
+    "visibility": "private",
+    "template": "feature_development"
+  },
+  "milestones": [
+    {
+      "title": "🏗️ M1: Foundation",
+      "description": "Technical foundation: Domain model, authentication, basic API endpoints. 20 issues, 40 development days.",
+      "duration_weeks": 10,
+      "issues_count": 20,
+      "dev_days": 40,
+      "team_focus": "2 Backend + 2 Frontend Entwickler"
+    },
+    {
+      "title": "🌟 M2: Core Features", 
+      "description": "Main functionality: Citizen portal, admin portal, waiting list management. 30 issues, 60 development days.",
+      "duration_weeks": 12,
+      "issues_count": 30,
+      "dev_days": 60,
+      "depends_on": "M1"
+    },
+    {
+      "title": "🚀 M3: Advanced Features",
+      "description": "Advanced workflows, reporting, mobile optimization, integrations. 25 issues, 50 development days.",
+      "duration_weeks": 10,
+      "issues_count": 25,
+      "dev_days": 50,
+      "depends_on": "M2"
+    },
+    {
+      "title": "🎯 M4: Production Ready",
+      "description": "Security hardening, performance optimization, deployment, go-live preparation. 15 issues, 30 development days.",
+      "duration_weeks": 8,
+      "issues_count": 15,
+      "dev_days": 30,
+      "depends_on": "M3"
+    }
+  ],
+  "labels": {
+    "size": [
+      { "name": "size/XS", "color": "00ff00", "description": "0.5 day - Trivial tasks" },
+      { "name": "size/S", "color": "ffff00", "description": "1 day - Simple features" },
+      { "name": "size/M", "color": "ff8800", "description": "1.5 days - Standard features" },
+      { "name": "size/L", "color": "ff0000", "description": "2 days - Complex features" },
+      { "name": "size/XL", "color": "000000", "description": ">2 days - SPLIT REQUIRED!" }
+    ],
+    "type": [
+      { "name": "feature", "color": "0075ca", "description": "New functionality" },
+      { "name": "bug", "color": "d73a4a", "description": "Something isn't working" },
+      { "name": "task", "color": "7057ff", "description": "Infrastructure/maintenance task" },
+      { "name": "documentation", "color": "0052cc", "description": "Improvements or additions to docs" },
+      { "name": "refactor", "color": "fbca04", "description": "Code quality improvement" }
+    ],
+    "priority": [
+      { "name": "priority/critical", "color": "b60205", "description": "🔥 Critical - Blocking issues" },
+      { "name": "priority/high", "color": "d93f0b", "description": "🚨 High - Important features" },
+      { "name": "priority/medium", "color": "fbca04", "description": "📋 Medium - Standard priority" },
+      { "name": "priority/low", "color": "0e8a16", "description": "📝 Low - Nice to have" }
+    ],
+    "component": [
+      { "name": "domain", "color": "5319e7", "description": "🏛️ Domain Layer (PROTECTED)" },
+      { "name": "application", "color": "1d76db", "description": "💼 Application Layer" },
+      { "name": "api", "color": "0052cc", "description": "🌐 Web API Controllers" },
+      { "name": "frontend", "color": "d4c5f9", "description": "🖥️ Angular Components" },
+      { "name": "database", "color": "c2e0c6", "description": "🗃️ Database/Migrations" },
+      { "name": "auth", "color": "f9d0c4", "description": "🔐 Authentication/Authorization" }
+    ],
+    "domain_risk": [
+      { "name": "domain-safe", "color": "28a745", "description": "🟢 Safe - No domain changes" },
+      { "name": "domain-review", "color": "ffc107", "description": "🟡 Review - Might affect domain" },
+      { "name": "domain-risk", "color": "dc3545", "description": "🔴 High Risk - Domain changes" },
+      { "name": "domain-blocked", "color": "6c757d", "description": "⚫ Blocked - Needs approval" }
+    ],
+    "workflow": [
+      { "name": "needs-sizing", "color": "f9c2ff", "description": "Needs size estimation" },
+      { "name": "needs-triage", "color": "d876cc", "description": "Needs initial review" },
+      { "name": "ready", "color": "c5f015", "description": "Ready for development" },
+      { "name": "in-progress", "color": "0075ca", "description": "Currently being worked on" },
+      { "name": "blocked", "color": "b60205", "description": "Blocked by external dependency" }
+    ]
+  },
+  "custom_fields": [
+    {
+      "name": "Size",
+      "type": "single_select",
+      "options": ["XS", "S", "M", "L", "XL"],
+      "default": "Not sized",
+      "required": false,
+      "description": "Time estimation for issue completion"
+    },
+    {
+      "name": "Component",
+      "type": "single_select",
+      "options": ["🏛️ Domain", "💼 Application", "🌐 API", "🖥️ Frontend", "🗃️ Database", "🔐 Auth", "📚 Docs", "🛠️ Infrastructure"],
+      "default": "Not classified",
+      "required": false,
+      "description": "Technical area of the issue"
+    },
+    {
+      "name": "Sprint",
+      "type": "single_select",
+      "options": ["Backlog", "Sprint 1", "Sprint 2", "Sprint 3", "Sprint 4", "Sprint 5", "Current Sprint", "Next Sprint"],
+      "default": "Backlog",
+      "required": false,
+      "description": "Sprint assignment for issue"
+    },
+    {
+      "name": "Domain Risk",
+      "type": "single_select", 
+      "options": ["🟢 Safe", "🟡 Review", "🔴 High Risk", "⚫ Blocked"],
+      "default": "Safe",
+      "required": true,
+      "description": "Domain model impact assessment"
+    },
+    {
+      "name": "Business Value",
+      "type": "single_select",
+      "options": ["🔥 Critical", "🚨 High", "📊 Medium", "📝 Low"],
+      "default": "Medium",
+      "required": false,
+      "description": "Business impact of the issue"
+    },
+    {
+      "name": "Complexity",
+      "type": "single_select",
+      "options": ["Simple", "Moderate", "Complex", "Research"],
+      "default": "Simple",
+      "required": false,
+      "description": "Technical complexity assessment"
+    },
+    {
+      "name": "Dependencies",
+      "type": "number",
+      "default": 0,
+      "required": false,
+      "description": "Number of issues this depends on"
+    }
+  ],
+  "views": [
+    {
+      "name": "Backlog",
+      "type": "board",
+      "group_by": "Status",
+      "columns": ["📝 New", "🏷️ Ready", "🏃 In Progress", "👀 In Review", "✅ Done"],
+      "filters": [
+        { "field": "Status", "operator": "not", "value": "Done" },
+        { "field": "Size", "operator": "is_not_empty" }
+      ],
+      "sort": [
+        { "field": "Priority", "direction": "desc" },
+        { "field": "Business Value", "direction": "desc" },
+        { "field": "Created", "direction": "asc" }
+      ],
+      "visible_fields": ["Title", "Assignees", "Size", "Component", "Sprint", "Domain Risk", "Business Value"]
+    },
+    {
+      "name": "Current Sprint",
+      "type": "board",
+      "group_by": "Assignee",
+      "filters": [
+        { "field": "Sprint", "operator": "equals", "value": "Current Sprint" },
+        { "field": "Status", "operator": "not", "value": "Done" }
+      ],
+      "sort": [
+        { "field": "Status", "direction": "custom" },
+        { "field": "Size", "direction": "asc" }
+      ],
+      "wip_limits": {
+        "In Progress": 3,
+        "In Review": 2
+      },
+      "visible_fields": ["Title", "Size", "Component", "Dev Type", "Domain Risk", "Dependencies"]
+    },
+    {
+      "name": "Milestones",
+      "type": "table",
+      "group_by": "Milestone",
+      "filters": [
+        { "field": "Milestone", "operator": "has_value" }
+      ],
+      "sort": [
+        { "field": "Milestone Due Date", "direction": "asc" },
+        { "field": "Business Value", "direction": "desc" }
+      ],
+      "visible_fields": ["Title", "Assignees", "Status", "Size", "Component", "Business Value", "Sprint", "Milestone", "Due Date"],
+      "calculations": ["count", "sum_size"]
+    },
+    {
+      "name": "Domain Protection",
+      "type": "table",
+      "filters": [
+        { "field": "Domain Risk", "operator": "in", "value": ["Review", "High Risk", "Blocked"] },
+        { "field": "Status", "operator": "not", "value": "Done" }
+      ],
+      "sort": [
+        { "field": "Domain Risk", "direction": "custom" },
+        { "field": "Created", "direction": "desc" }
+      ],
+      "visible_fields": ["Title", "Assignees", "Status", "Domain Risk", "Component", "Labels", "Comments"],
+      "highlighting": {
+        "red": { "field": "Domain Risk", "value": "Blocked" },
+        "yellow": { "field": "Domain Risk", "value": "High Risk" }
+      }
+    },
+    {
+      "name": "Team Workload",
+      "type": "table", 
+      "group_by": "Assignee",
+      "filters": [
+        { "field": "Status", "operator": "in", "value": ["In Progress", "Ready"] },
+        { "field": "Assignee", "operator": "has_value" }
+      ],
+      "sort": [
+        { "field": "Assignee", "direction": "asc" },
+        { "field": "Size", "direction": "desc" }
+      ],
+      "visible_fields": ["Title", "Status", "Size", "Component", "Sprint", "Domain Risk"],
+      "calculations": ["count_per_assignee", "sum_size_per_assignee"]
+    }
+  ],
+  "automation_rules": [
+    {
+      "name": "Size Validation",
+      "trigger": "issue_opened",
+      "conditions": [
+        { "field": "labels", "operator": "not_contains", "value": "size/" }
+      ],
+      "actions": [
+        { "type": "add_label", "value": "needs-sizing" },
+        { "type": "add_comment", "template": "size_estimation_comment" }
+      ]
+    },
+    {
+      "name": "Domain Protection Alert",
+      "trigger": "issue_labeled",
+      "conditions": [
+        { "field": "label", "operator": "contains", "value": "domain" }
+      ],
+      "actions": [
+        { "type": "set_field", "field": "Domain Risk", "value": "High Risk" },
+        { "type": "add_label", "value": "needs-approval" },
+        { "type": "add_comment", "template": "domain_protection_comment" }
+      ]
+    },
+    {
+      "name": "XL Issue Warning",
+      "trigger": "issue_labeled",
+      "conditions": [
+        { "field": "label", "operator": "equals", "value": "size/XL" }
+      ],
+      "actions": [
+        { "type": "add_comment", "template": "split_required_comment" },
+        { "type": "add_label", "value": "blocked" }
+      ]
+    },
+    {
+      "name": "Feature Validation",
+      "trigger": "issue_labeled",
+      "conditions": [
+        { "field": "label", "operator": "equals", "value": "feature" }
+      ],
+      "actions": [
+        { "type": "validate_backend_frontend", "template": "feature_validation_comment" }
+      ]
+    },
+    {
+      "name": "PR Status Update",
+      "trigger": "pr_opened",
+      "actions": [
+        { "type": "update_linked_issues", "status": "In Review" },
+        { "type": "add_comment", "template": "pr_created_comment" }
+      ]
+    }
+  ],
+  "comment_templates": {
+    "size_estimation_comment": "📏 **Size Estimation Required**\n\nThis issue needs size estimation before it can be planned for a sprint.\n\n**Available Size Labels:**\n- `size/XS` - 0.5 day (Trivial tasks)\n- `size/S` - 1 day (Simple features)\n- `size/M` - 1.5 days (Standard features)\n- `size/L` - 2 days (Complex features)\n- `size/XL` - >2 days (**SPLIT REQUIRED!**)\n\n**For Feature Issues:**\nRemember that features must include both Backend AND Frontend work within the time estimate.\n\n📋 Please add the appropriate size label and remove `needs-sizing` when done.",
+    
+    "domain_protection_comment": "⚠️ **Domain Protection Alert**\n\nThis issue has been flagged as potentially affecting the protected domain model.\n\n**Required Actions:**\n1. 📚 Review [CLAUDE.md Domain Protection Contract](../CLAUDE.md)\n2. 🏛️ Get approval from Domain Architect before proceeding\n3. 🛡️ Run domain guard validation: `.domain-guard/pre-commit-hook.sh`\n4. 📋 Document any domain impact in the issue description\n\n🚨 **CRITICAL**: Do not proceed with implementation until domain approval is received.",
+    
+    "split_required_comment": "🚨 **Issue Split Required**\n\nThis issue is marked as `size/XL` (>2 days), which violates our sizing guidelines.\n\n**Required Actions:**\n1. 📋 Break this issue into smaller, manageable pieces\n2. 🎯 Each split issue should be max 2 days (size/L or smaller)\n3. 🔗 Link related issues with \"Part of #{{issue_number}}\"\n4. 📊 Consider these split strategies:\n   - **Horizontal**: Backend first, then Frontend\n   - **Vertical**: MVP functionality, then enhancements\n   - **Technical**: Core logic, then UI polish\n\n⚠️ This issue will remain blocked until it's properly split into size/L or smaller issues.",
+    
+    "feature_validation_comment": "⚠️ **Feature Issue Incomplete**\n\nFeature issues must include BOTH Backend AND Frontend work.\n\n**Required for Feature Issues:**\n\n**Backend Tasks:**\n- [ ] API Controller/Endpoints\n- [ ] Business Logic Implementation\n- [ ] Database Changes (if needed)\n- [ ] Unit Tests\n\n**Frontend Tasks:**\n- [ ] Angular Components\n- [ ] Forms/UI Implementation\n- [ ] State Management\n- [ ] Component Tests\n\n📝 Please update the issue description to include both backend and frontend tasks.",
+    
+    "pr_created_comment": "🔄 **Pull Request Created**\n\nPR #{{pr_number}} has been created for this issue: \"{{pr_title}}\"\n\n**PR Status:** {{pr_status}}\n**Author:** @{{pr_author}}\n\nIssue status updated to \"In Review\""
+  },
+  "team_settings": {
+    "wip_limits": {
+      "per_developer": 3,
+      "per_team": 10
+    },
+    "sprint_settings": {
+      "duration_weeks": 2,
+      "capacity_per_developer": 8,
+      "buffer_percentage": 20
+    },
+    "domain_protection": {
+      "required_approvers": ["andrekirst"],
+      "auto_block_domain_changes": true,
+      "domain_guard_integration": true
+    }
+  },
+  "metrics_config": {
+    "velocity_tracking": {
+      "enabled": true,
+      "metric_types": ["story_points", "issue_count", "cycle_time"]
+    },
+    "burndown_charts": {
+      "enabled": true,
+      "update_frequency": "daily"
+    },
+    "domain_compliance": {
+      "enabled": true,
+      "violation_alerts": true
+    }
+  }
+}

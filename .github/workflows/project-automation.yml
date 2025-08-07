@@ -1,0 +1,407 @@
+name: KGV Project Management Automation
+
+on:
+  issues:
+    types: [opened, labeled, assigned, closed, edited]
+  pull_request:
+    types: [opened, closed, merged, ready_for_review]
+  issue_comment:
+    types: [created]
+
+env:
+  PROJECT_NUMBER: 5  # KGV-v2 project number
+
+jobs:
+  auto-assign-to-project:
+    name: "Auto-assign Issues to Project"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+      - name: Add issue to project
+        uses: actions/add-to-project@v0.4.0
+        with:
+          project-url: https://github.com/users/andrekirst/projects/${{ env.PROJECT_NUMBER }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  domain-protection-check:
+    name: "Domain Protection Alert"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && (github.event.action == 'labeled' || github.event.action == 'opened')
+    
+    steps:
+      - name: Check for domain-related labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(label => label.name);
+            
+            // Check for domain-related labels
+            const domainLabels = labels.filter(label => 
+              label.includes('domain') || 
+              label.includes('Domain') ||
+              label.includes('domain-risk') ||
+              label.includes('domain-review')
+            );
+            
+            if (domainLabels.length > 0) {
+              // Add domain protection comment
+              const comment = `⚠️ **Domain Protection Alert**
+              
+              This issue has been flagged as potentially affecting the protected domain model.
+              
+              **Required Actions:**
+              1. 📚 Review [CLAUDE.md Domain Protection Contract](../CLAUDE.md)
+              2. 🏛️ Get approval from Domain Architect before proceeding
+              3. 🛡️ Run domain guard validation: \`.domain-guard/pre-commit-hook.sh\`
+              4. 📋 Document any domain impact in the issue description
+              
+              **Domain Labels Detected:** ${domainLabels.join(', ')}
+              
+              🚨 **CRITICAL**: Do not proceed with implementation until domain approval is received.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: comment
+              });
+              
+              // Add additional labels if not already present
+              const labelsToAdd = [];
+              if (!labels.includes('needs-approval')) {
+                labelsToAdd.push('needs-approval');
+              }
+              if (!labels.includes('domain-blocked')) {
+                labelsToAdd.push('domain-blocked');
+              }
+              
+              if (labelsToAdd.length > 0) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: labelsToAdd
+                });
+              }
+            }
+
+  size-validation:
+    name: "Size Label Validation"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+      - name: Check for size label
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(label => label.name);
+            
+            // Check if issue has a size label
+            const sizeLabels = labels.filter(label => label.startsWith('size/'));
+            
+            if (sizeLabels.length === 0) {
+              // Add needs-sizing label and comment
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['needs-sizing']
+              });
+              
+              const comment = `📏 **Size Estimation Required**
+              
+              This issue needs size estimation before it can be planned for a sprint.
+              
+              **Available Size Labels:**
+              - \`size/XS\` - 0.5 day (Trivial tasks)
+              - \`size/S\` - 1 day (Simple features)  
+              - \`size/M\` - 1.5 days (Standard features)
+              - \`size/L\` - 2 days (Complex features)
+              - \`size/XL\` - >2 days (**SPLIT REQUIRED!**)
+              
+              **For Feature Issues:**
+              Remember that features must include both Backend AND Frontend work within the time estimate.
+              
+              **For Bug Issues:**
+              Size based on single layer (Backend OR Frontend) that needs fixing.
+              
+              📋 Please add the appropriate size label and remove \`needs-sizing\` when done.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: comment
+              });
+            }
+
+  xl-issue-warning:
+    name: "XL Issue Split Warning"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'labeled'
+    
+    steps:
+      - name: Check for XL size label
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const label = context.payload.label;
+            
+            if (label.name === 'size/XL') {
+              const comment = `🚨 **Issue Split Required**
+              
+              This issue is marked as \`size/XL\` (>2 days), which violates our sizing guidelines.
+              
+              **Required Actions:**
+              1. 📋 Break this issue into smaller, manageable pieces
+              2. 🎯 Each split issue should be max 2 days (size/L or smaller)
+              3. 🔗 Link related issues with "Part of #${context.payload.issue.number}"
+              4. 📊 Consider these split strategies:
+                 - **Horizontal**: Backend first, then Frontend
+                 - **Vertical**: MVP functionality, then enhancements
+                 - **Technical**: Core logic, then UI polish
+              
+              **Splitting Guidelines:**
+              - Features: Separate Backend API from Frontend UI
+              - Complex Features: Core functionality vs. nice-to-have features
+              - Infrastructure: Setup vs. Configuration vs. Testing
+              
+              ⚠️ This issue will remain blocked until it's properly split into size/L or smaller issues.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                body: comment
+              });
+              
+              // Add blocked label
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                labels: ['blocked']
+              });
+            }
+
+  feature-validation:
+    name: "Feature Issue Validation"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'labeled'
+    
+    steps:
+      - name: Validate feature issue requirements
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(label => label.name);
+            
+            if (labels.includes('feature')) {
+              const body = issue.body || '';
+              
+              // Check if issue mentions both backend and frontend
+              const hasBackend = body.toLowerCase().includes('backend') || 
+                               body.toLowerCase().includes('api') ||
+                               body.toLowerCase().includes('controller') ||
+                               body.toLowerCase().includes('service');
+                               
+              const hasFrontend = body.toLowerCase().includes('frontend') || 
+                                body.toLowerCase().includes('component') ||
+                                body.toLowerCase().includes('ui') ||
+                                body.toLowerCase().includes('angular');
+              
+              if (!hasBackend || !hasFrontend) {
+                const comment = `⚠️ **Feature Issue Incomplete**
+                
+                Feature issues must include BOTH Backend AND Frontend work.
+                
+                **Missing Components:**
+                ${!hasBackend ? '- ❌ Backend tasks (API endpoints, business logic, database)' : '- ✅ Backend tasks identified'}
+                ${!hasFrontend ? '- ❌ Frontend tasks (UI components, forms, state management)' : '- ✅ Frontend tasks identified'}
+                
+                **Required for Feature Issues:**
+                
+                **Backend Tasks:**
+                - [ ] API Controller/Endpoints
+                - [ ] Business Logic Implementation
+                - [ ] Database Changes (if needed)
+                - [ ] Unit Tests
+                
+                **Frontend Tasks:**
+                - [ ] Angular Components
+                - [ ] Forms/UI Implementation
+                - [ ] State Management
+                - [ ] Component Tests
+                
+                📝 Please update the issue description to include both backend and frontend tasks.`;
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: comment
+                });
+                
+                // Add needs-refinement label
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: ['needs-refinement']
+                });
+              }
+            }
+
+  pr-linked-issue-update:
+    name: "Update Issue on PR Events"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Update linked issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const action = context.payload.action;
+            
+            // Extract issue numbers from PR body and title
+            const text = `${pr.title} ${pr.body || ''}`;
+            const issueMatches = text.match(/#(\d+)/g);
+            
+            if (!issueMatches) return;
+            
+            const issueNumbers = issueMatches.map(match => parseInt(match.substring(1)));
+            
+            for (const issueNumber of issueNumbers) {
+              let comment = '';
+              let labelsToAdd = [];
+              let labelsToRemove = [];
+              
+              if (action === 'opened' || action === 'ready_for_review') {
+                comment = `🔄 **Pull Request Created**
+                
+                PR #${pr.number} has been created for this issue: "${pr.title}"
+                
+                **PR Status:** ${pr.draft ? 'Draft' : 'Ready for Review'}
+                **Author:** @${pr.user.login}
+                
+                Issue status updated to "In Review"`;
+                
+                labelsToAdd = ['in-review'];
+                labelsToRemove = ['in-progress'];
+                
+              } else if (action === 'closed' && pr.merged) {
+                comment = `✅ **Completed via PR #${pr.number}**
+                
+                This issue has been successfully completed and merged.
+                
+                **Merged by:** @${pr.merged_by?.login || pr.user.login}
+                **Merged at:** ${new Date(pr.merged_at).toLocaleString()}
+                
+                Great work! 🎉`;
+                
+                labelsToAdd = ['completed'];
+                labelsToRemove = ['in-review', 'in-progress'];
+                
+              } else if (action === 'closed' && !pr.merged) {
+                comment = `❌ **PR Closed Without Merge**
+                
+                PR #${pr.number} was closed without being merged.
+                
+                Issue status reverted to previous state. Please create a new PR when ready.`;
+                
+                labelsToRemove = ['in-review'];
+                labelsToAdd = ['ready'];
+              }
+              
+              if (comment) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: comment
+                });
+              }
+              
+              // Update labels
+              if (labelsToRemove.length > 0) {
+                for (const label of labelsToRemove) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issueNumber,
+                      name: label
+                    });
+                  } catch (error) {
+                    // Label might not exist, that's OK
+                    console.log(`Label ${label} not found on issue ${issueNumber}`);
+                  }
+                }
+              }
+              
+              if (labelsToAdd.length > 0) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  labels: labelsToAdd
+                });
+              }
+            }
+
+  velocity-tracking:
+    name: "Velocity and Metrics Tracking"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'closed'
+    
+    steps:
+      - name: Track completion metrics
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(label => label.name);
+            
+            // Get size label
+            const sizeLabel = labels.find(label => label.startsWith('size/'));
+            const milestone = issue.milestone?.title || 'No Milestone';
+            const assignees = issue.assignees.map(user => user.login).join(', ') || 'Unassigned';
+            
+            // Calculate completion time
+            const created = new Date(issue.created_at);
+            const closed = new Date(issue.closed_at);
+            const completionDays = Math.ceil((closed - created) / (1000 * 60 * 60 * 24));
+            
+            const metricsComment = `📊 **Completion Metrics**
+            
+            **Issue Completed:** #${issue.number}
+            **Size:** ${sizeLabel || 'Not sized'}
+            **Milestone:** ${milestone}
+            **Assignees:** ${assignees}
+            **Completion Time:** ${completionDays} days
+            **Created:** ${created.toLocaleDateString()}
+            **Completed:** ${closed.toLocaleDateString()}
+            
+            This data helps us improve our estimation accuracy and team velocity! 📈`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: metricsComment
+            });
+            
+            console.log(`Issue #${issue.number} completed - Size: ${sizeLabel}, Time: ${completionDays} days`);

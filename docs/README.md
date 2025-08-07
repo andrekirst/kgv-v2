@@ -23,7 +23,9 @@
 - **[UX Design Guide](ux-design-guide.md)** - 🎨 BITV 2.0 compliant UX
 
 ### 🔧 **Implementation Guides**
+- **[Project Management Guide](project-management-guide.md)** - 📋 Issue sizing & milestone planning
 - **[Git Workflow Guide](git-workflow-guide.md)** - 🌿 Branch protection & commit standards
+- **[Issue Sizing Guidelines](issue-sizing-guidelines.md)** - 📏 1-2 day issue breakdown
 - **[API Documentation](api-documentation.md)** - 🌐 RESTful API specifications
 - **[Database Schema](database-schema.md)** - 🗃️ Entity Framework configurations
 - **[Testing Strategy](testing-strategy.md)** - 🧪 Unit, integration & E2E tests
@@ -88,7 +90,10 @@
 ### **🔧 Implementation Guides**
 | Document | Target Audience | Complexity |
 |----------|-----------------|------------|
+| **[Project Management Guide](project-management-guide.md)** | All Team Members | ⭐⭐ |
 | **[Development Workflow](development-workflow.md)** | All Developers | ⭐⭐⭐ |
+| **[Issue Sizing Guidelines](issue-sizing-guidelines.md)** | Developers & PM | ⭐⭐ |
+| **[GitHub Projects Setup](github-projects-setup.md)** | Project Manager | ⭐⭐⭐ |
 | **[API Documentation](api-documentation.md)** | Backend Devs | ⭐⭐ |
 | **[Testing Strategy](testing-strategy.md)** | QA & Devs | ⭐⭐⭐ |
 | **[Security Guide](security-guide.md)** | DevOps & Security | ⭐⭐⭐⭐ |

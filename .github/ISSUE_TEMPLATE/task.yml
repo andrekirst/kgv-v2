@@ -1,0 +1,219 @@
+name: 📋 Task/Chore
+description: Infrastructure, documentation, or maintenance task
+title: "task: [Task Name] - [Context]"
+labels: ["task", "needs-sizing"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📋 Task/Chore
+        
+        **Important**: Tasks should be focused, actionable items that take maximum 2 days to complete.
+        
+        Use this template for infrastructure setup, documentation updates, maintenance tasks, or other non-feature work.
+
+  - type: input
+    id: task-name
+    attributes:
+      label: Task Name
+      description: Short, descriptive name for the task
+      placeholder: e.g., "Setup CI/CD Pipeline", "Update API Documentation"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: 🏷️ Task Type
+      description: What kind of task is this?
+      options:
+        - "🛠️ Infrastructure/DevOps"
+        - "📚 Documentation"
+        - "🔧 Configuration/Setup"
+        - "🧪 Testing Infrastructure"
+        - "🔐 Security/Compliance"
+        - "📈 Monitoring/Logging"
+        - "🔄 Refactoring"
+        - "🧹 Code Cleanup"
+        - "📦 Dependencies/Libraries"
+        - "🎨 Design System/UI"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📋 Description
+      description: Clear description of what needs to be done and why
+      placeholder: Explain the task, its purpose, and the expected outcome
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 🎯 Motivation/Business Value
+      description: Why is this task important? What problem does it solve?
+      placeholder: |
+        - Improves developer productivity
+        - Enhances system security
+        - Reduces technical debt
+        - Enables future features
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: acceptance-criteria
+    attributes:
+      label: ✅ Acceptance Criteria
+      description: Define what "done" looks like for this task
+      options:
+        - label: "Task is completed successfully"
+        - label: "Documentation is updated (if applicable)"
+        - label: "Team is notified of changes (if applicable)"
+        - label: "Testing is performed to verify changes work"
+        - label: "No regression in existing functionality"
+
+  - type: textarea
+    id: detailed-tasks
+    attributes:
+      label: 📝 Detailed Task List
+      description: Break down the task into specific actionable items
+      placeholder: |
+        - [ ] Research and plan approach
+        - [ ] Implement/configure solution
+        - [ ] Test the implementation
+        - [ ] Update documentation
+        - [ ] Deploy/apply changes
+      value: |
+        - [ ] Plan and research approach
+        - [ ] Implement the solution
+        - [ ] Test and verify functionality
+        - [ ] Update relevant documentation
+        - [ ] Review and deploy changes
+
+  - type: dropdown
+    id: estimated-size
+    attributes:
+      label: 📊 Size Estimation
+      description: How long do you estimate this will take?
+      options:
+        - "0.5 day (size/XS)"
+        - "1 day (size/S)"
+        - "1.5 days (size/M)"
+        - "2 days (size/L)"
+        - "> 2 days (SPLIT REQUIRED!)"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: components-affected
+    attributes:
+      label: 🎯 Areas Affected
+      description: Which parts of the system will this task affect?
+      options:
+        - label: "CI/CD Pipeline"
+        - label: "Docker Configuration"
+        - label: "Database/Migrations"
+        - label: "API Documentation"
+        - label: "Frontend Build Process"
+        - label: "Security Configuration"
+        - label: "Monitoring/Logging"
+        - label: "Development Tools"
+        - label: "Documentation"
+        - label: "Testing Infrastructure"
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📊 Priority
+      description: How urgent is this task?
+      options:
+        - "🔥 Critical - Blocking other work"
+        - "🚨 High - Should be done soon"
+        - "📋 Medium - Normal priority"
+        - "📝 Low - Nice to have"
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-requirements
+    attributes:
+      label: 🔧 Technical Requirements
+      description: Any specific technical requirements or constraints
+      placeholder: |
+        - Required tools or technologies
+        - Performance requirements
+        - Security considerations  
+        - Compatibility requirements
+        - Resource limitations
+
+  - type: textarea
+    id: success-metrics
+    attributes:
+      label: 📈 Success Metrics
+      description: How will you measure that this task was successful?
+      placeholder: |
+        - Build time reduced by X%
+        - Documentation coverage increased
+        - Security score improved
+        - Developer productivity metrics
+
+  - type: textarea
+    id: risks-concerns
+    attributes:
+      label: ⚠️ Risks and Concerns
+      description: What could go wrong? What should we be careful about?
+      placeholder: |
+        - Potential breaking changes
+        - Dependencies on external services
+        - Need for system downtime
+        - Impact on existing workflows
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: 🔗 Related Issues
+      description: Link any related issues or dependencies
+      placeholder: |
+        - Relates to #123
+        - Depends on #456
+        - Blocks #789
+        - Part of epic #012
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: 📚 Resources/References
+      description: Links to documentation, examples, or references
+      placeholder: |
+        - Documentation links
+        - Tutorial references
+        - Example implementations
+        - Relevant GitHub issues/PRs
+
+  - type: checkboxes
+    id: domain-impact
+    attributes:
+      label: 🛡️ Domain Model Impact
+      description: Does this task involve the protected domain model?
+      options:
+        - label: "⚠️ This task might affect domain model (requires approval)"
+        - label: "✅ This is infrastructure/documentation only (safe to proceed)"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: ✅ Pre-submission Checklist
+      description: Please verify before submitting
+      options:
+        - label: "I have clearly defined what needs to be done"
+          required: true
+        - label: "I have explained why this task is important"
+          required: true
+        - label: "I have estimated the task will take maximum 2 days"
+          required: true
+        - label: "I have considered potential risks and impacts"
+          required: true
