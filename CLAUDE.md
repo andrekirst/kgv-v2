@@ -220,6 +220,46 @@ private static readonly Dictionary<ApplicationStatus, ApplicationStatus[]> Valid
 3. ✅ **Event schemas**: Comply with versioned formats
 4. ✅ **Tests**: Validate against domain specifications
 
+### **Phase 4: Pull Request Creation (MANDATORY)**
+
+When creating Pull Requests, ALWAYS apply the following steps automatically:
+
+1. 🏷️ **Copy Labels from Issue**: Apply all labels from the source issue to the PR
+2. 📋 **Add to Project**: Add PR to the same project board as the source issue
+3. 🎯 **Set Milestone**: Set the same milestone as the source issue
+4. 🔗 **Link Issue**: Use keywords (Closes #X, Fixes #X, Resolves #X) to auto-close issue on merge
+5. 📝 **Reference Implementation**: Include issue number and reference in PR title and description
+
+**Pull Request Template:**
+```bash
+gh pr create \
+  --title "feat: [Feature Name] - Closes #[ISSUE_NUMBER]" \
+  --body "$(cat <<'EOF'
+## Summary
+- Brief description of implemented feature
+- Reference to Issue #[ISSUE_NUMBER]
+
+## Implementation Details
+- Key technical decisions and features
+- Architecture patterns used
+
+## Test Plan
+- [x] All acceptance criteria from Issue #[ISSUE_NUMBER] met
+- [x] Tests pass
+- [x] Build succeeds
+
+Closes #[ISSUE_NUMBER]
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+EOF
+)" \
+  --label "[COPY_FROM_ISSUE]" \
+  --milestone "[COPY_FROM_ISSUE]" \
+  --project "[COPY_FROM_ISSUE]"
+```
+
+**CRITICAL**: Never create PRs without proper issue linking, labels, milestones, and project assignment!
+
 ---
 
 ## 🚨 DOMAIN CHANGE PROTOCOL
@@ -327,6 +367,29 @@ If you need to modify the domain model:
 - 🎮 **CQRS Implementation**: Use application layer patterns
 - 🌐 **API Design**: Follow RESTful conventions with domain DTOs
 - 🧪 **Testing Strategy**: Domain specifications as test cases
+
+### **Context7 Integration for Up-to-Date Documentation**
+
+When working with external libraries, frameworks, or APIs, ALWAYS use Context7 to get current, accurate documentation and code examples:
+
+**Usage Pattern:**
+1. 📝 **Write your prompt naturally** describing what you want to implement
+2. 🔍 **Add "use context7"** to your prompt to fetch up-to-date documentation
+3. 💡 **Get working code answers** with current APIs and best practices
+
+**Examples:**
+- "Create an Angular service for HTTP API calls with error handling. use context7"
+- "Implement JWT authentication middleware in .NET Core. use context7"  
+- "Configure Entity Framework with PostgreSQL connection. use context7"
+- "Set up Angular Material theme customization. use context7"
+
+**Benefits:**
+- ✅ **Current Documentation**: Always up-to-date library docs and examples
+- ✅ **No Hallucinated APIs**: Real, working code examples from source
+- ✅ **Version-Specific**: Gets documentation for exact library versions
+- ✅ **Best Practices**: Official patterns and recommended approaches
+
+**CRITICAL**: Always use Context7 when implementing features with external dependencies to ensure code accuracy and current best practices!
 
 ---
 
